@@ -1,6 +1,10 @@
 # Spliceogen
 Spliceogen is an integrative, scalable tool for the discovery of splice-disrupting variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates some of the individually best performing models for splice motif prediction: MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNPs and indels.
 
+## Getting Started
+
+Instructions for installation and obtaining the required genome annotation files.
+
 ### Installation:
 
 Navigate to your desired installation directory and clone this repository:
@@ -10,12 +14,15 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 
 ### Required annotation files:
 -Any whole genome fasta (.fa)
+
 -Any GTF genome annotation (.gtf)
 
 ### Downloading required files:
 
 Browse and download desired versions from UCSC and Gencode:
+
 hgdownload.soe.ucsc.edu/downloads.html#human
+
 https://www.gencodegenes.org/human
 
 Alternatively, hg38 releases can be retrieved using:
@@ -25,17 +32,19 @@ Alternatively, hg38 releases can be retrieved using:
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
-
 The "basic" gencode datasets are recommended. Users may want to restrict the analysis to annotated protein coding genes. Modify the GTF annotation using:
+```
 grep "protein_coding"
+```
 
 ## Basic Usage:
+
 ```
 > cd path/to/Spliceogen
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
 
-### Branchpointer Installation:
+### Including Branchpointer:
 
 To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
 ```
