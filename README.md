@@ -20,8 +20,8 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 
 ### Downloading required files:
 
-Browse and download desired versions from [UCSC] (hgdownload.soe.ucsc.edu/downloads.html#human)
-and [Gencode] (https://www.gencodegenes.org/human)
+Browse and download desired versions from [UCSC](hgdownload.soe.ucsc.edu/downloads.html#human/)
+and [Gencode](https://www.gencodegenes.org/human/)
 
 Alternatively, hg38 releases can be retrieved using:
 ```
