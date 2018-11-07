@@ -1,3 +1,21 @@
-Copyright (c) 2003, The Institute for Genomic Research (TIGR), Rockville,
-Maryland, U.S.A.  All rights reserved.
+/* 
+ *  Copyright (c) 2003, The Institute for Genomic Research (TIGR), Rockville,
+ *  Maryland, U.S.A.  All rights reserved.
+
+ *   genesplicer.cpp was designed by Mihaela PERTEA to find splice 
+ *   sites in a fasta file
+
+NOTICE:
+Adapted by Steve Monger in August 2018 in order to:
+1) allow processing of multiple-line FASTA input files.
+2) to read strand and variant information from the input FASTA header lines.
+3) to restrict motif scanning to only the given strand orientation.
+4) to output variant information alongside predictions.
+
+The original source code is included for comparison using:
+>diff genesplicer.cpp genesplicerOriginal.cpp
+The original executable is provided. The adapted executable has been renamed.
+Those original files and this notice should be retained in any future reproductions in accordance with the original license.
+
+*/
 

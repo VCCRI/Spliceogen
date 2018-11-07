@@ -1,0 +1,4 @@
+#CHR	#START	#REF	#ALT	#GENE	#withinSite	#mesDonRef	#mesDonAlt	#mesAccRef	#mesAccAlt	#gsDonRef	#gsDonAlt	#gsAccRef	#gsAccAlt	#ESEmaxRef	#ESEmaxAlt	#ESSminRef	#ESSminAlt
+chr1	6139364	A	G	CHD5	.	.	.	-1.8	-3.23	.	.	.	.	.	.	-0.35	-0.316
+chr1	6144162	C	G	CHD5	ENSE00003597382.1_acceptor,ENSE00003597382.1_acceptor	-11.9	-16.85	7.56	9.09	0.464105	1.006464	5.941549	5.885955	0.196	0.337	-0.111	-0.251
+chr1	6155111	C	CG	CHD5	.	-3.15	-7.45	.	.	.	.	.	.	.	.	-0.392	-0.279

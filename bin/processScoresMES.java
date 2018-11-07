@@ -7,6 +7,7 @@ public static void main(String[] args) {
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	//score tracking variables
 	String previousID = "";
+    String previousDonOrAcc = "";
     String s = "";
 	double highestRef = -99;
 	double highestAlt = -99;
@@ -21,6 +22,8 @@ public static void main(String[] args) {
         s=s.substring(leading-1);
     	String refOrAlt = s.substring(s.length()-3);
         String donOrAcc = "MES"+s.substring(s.length()-6, s.length()-3);
+    	//System.out.println("s...currentScore...refOrAlt...donOrAcc");
+    	//System.out.println(s+"..."+Double.toString(currentScore)+"..."+refOrAlt+"..."+donOrAcc);
     	//if not very first line
     	if (!(previousID.equals(""))) {
     	    //if current line is next variant 
@@ -49,17 +52,17 @@ public static void main(String[] args) {
     		}
     	}	
     	previousID = s;	
+        previousDonOrAcc = donOrAcc;
     }
    	//print final variant
-    String[] sep = s.split(";");
+    String[] sep = previousID.split(";");
     String chr = sep[0];
     int start = Integer.parseInt(sep[1]);
     String ref = sep[2];
     int end = start + ref.length() -1;
     String alt = sep[3];
     alt = alt.replace("(", "");
-    String donOrAcc = "MES"+s.substring(s.length()-6, s.length()-3);
-   	System.out.println(chr+"\t"+start+"\t"+ref+"\t"+alt+"\t"+donOrAcc+"\t"+highestRef+"\t"+highestAlt);
+   	System.out.println(chr+"\t"+start+"\t"+ref+"\t"+alt+"\t"+previousDonOrAcc+"\t"+highestRef+"\t"+highestAlt);
     in.close();
     } catch (Exception e) {
         e.printStackTrace();

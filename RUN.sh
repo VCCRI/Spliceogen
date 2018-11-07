@@ -60,13 +60,13 @@ if [ ! -f $FASTAPATH ]; then
     echo -e "Fasta file not found: use -fasta ./path/to/hgXX.fa\nExiting..."
     exit 1
 elif [ ! -f "$ANNOTATION" ]; then
-    echo "GTF annotation file not found: use -annotation path/to/gencodeXX.gtf\nExiting..."
+    echo "GTF annotation file not found: use -gtf path/to/gencodeXX.gtf\nExiting..."
     exit 1
 fi
 #prepare splice site intervals from annotation.gtf
 if [ ! -f data/annotationIntervals.txt ] || [[ "$ANNOTATION" -nt data/annotationIntervals.txt ]] ; then
     echo "Preparing splice site annotation..."
-    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]exon[[:blank:]]' data/"$ANNOTATION" | java -cp bin getSpliceSiteIntervalsFromGTF > data/annotationIntervals.txt
+    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | java -cp bin getSpliceSiteIntervalsFromGTF > data/annotationIntervals.txt
 fi
 #for each file
 for FILE in $INPUTFILES; do
@@ -79,14 +79,14 @@ for FILE in $INPUTFILES; do
     grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    grep '[[:blank:]]gene[[:blank:]]' data/"$ANNOTATION" | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt
+    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt
     #generate flanking intervals.bed for bedtools getfasta
-    if [ ! "$INPUTVCF" = "FALSE" ]; then
+    if [ "$INPUTVCF" = "TRUE" ]; then
         grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $4, $5}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
         grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $4, $5}' | sort -u | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
-    elif [ ! "$INPUTBED" = "FALSE" ]; then
-        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $5, $6}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
-        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $5, $6}' | sort -u | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
+    elif [ "$INPUTBED" = "TRUE" ]; then
+        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $7, $8}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | sort -u | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
     fi
     echo "Retrieving flanking FASTA sequence..."
     bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA
