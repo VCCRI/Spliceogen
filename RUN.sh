@@ -164,5 +164,5 @@ for FILE in $INPUTFILES; do
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/annotationIntervals.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
     #clean up temp files
-    #rm temp/"$fileID"* 2> /dev/null
+    rm temp/"$fileID"* 2> /dev/null
 done
