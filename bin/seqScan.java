@@ -18,6 +18,7 @@ class seqScan {
     public static double[] ESStable = createESRarrays("data/ESS.txt");
     public static boolean useESR= true;
     public static String fileID="";
+    public static boolean invalidFastaFound = false;
 
 public static void main(String[] args) {	
     
@@ -41,7 +42,7 @@ public static void main(String[] args) {
     while ((header = br.readLine()) != null) {
         s = br.readLine();
         try {
-	        scanStrings(header, s);
+	        scanStrings(header, s, args[2]);
         }
         catch (Exception e){
             e.printStackTrace();   
@@ -55,7 +56,7 @@ public static void main(String[] args) {
     appendToFiles();
 }
 
-public static void scanStrings (String header, String s) {
+public static void scanStrings (String header, String s, String fileID) {
 	/* SCANNING EXPLANATION
         For MaxEntScan, a region of 45bp with variant at middle nucleotide 23 is needed (anywhere ref/alt can contribute to the motif).
 	    Scan for acceptor AG from nucleotide pos 19 to 41, and for donor GT from pos 18 to 26 and generate query strings for scoring
@@ -175,7 +176,11 @@ public static void scanStrings (String header, String s) {
         }
     }
     if (illegalCharacters) {
-        System.out.println("variant: " +id+ " omitted from MaxEntScan due to invalid character (usually \"n\" in FASTA sequence or \",\" in alt" );  
+        if (!invalidFastaFound) {
+            System.out.println("Warning: variant(s) were omitted from MaxEntScan due to invalid character (usually \"n\") in FASTA sequence" + "\n" + "List of ommitted variants outputted to: data/"+fileID+"mesOmmitted.txt");  
+        }
+        invalidFastaFound = true;
+        appendOmmitted(id);
     }
     else {
         //scan ref sequence
@@ -444,4 +449,13 @@ public static void appendToFiles () {
     }
 }
 
+public static void appendOmmitted(String id) {
+    try {
+        FileWriter fw = new FileWriter(id, true);
+        BufferedWriter writer = new BufferedWriter(fw);
+        writer.write(id+"\n");
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
+    }
+}
 }

@@ -19,7 +19,8 @@ public static void main (String[] args) {
     int[] donEnd = new int[1000];
     int[] accStart = new int[1000];
     int[] accEnd = new int[1000];
-    String[] exonNames = new String[1000];
+    String[] donNames = new String[1000];
+    String[] accNames = new String[1000];
     Arrays.fill(scores, -99.0);
     Arrays.fill(finalLineScores, -99.0);
     //Note "scores" array order:
@@ -58,18 +59,20 @@ public static void main (String[] args) {
                 if (prevAlt.equals("*")) {
                     endPos++;
                 }
-                for (int i=0; i<exonNames.length-1; i++) {
+                for (int i=0; i<donNames.length; i++) {
                     if (endPos>=donStart[i]&&startPos<=donEnd[i]) {
                         if (!withinSS.equals("")) {
                             withinSS=withinSS.concat(",");
                         }
-                        withinSS = withinSS.concat(exonNames[i]).concat("_donor");
+                        withinSS = withinSS.concat(donNames[i]).concat("_donor");
                     }
+                }
+                for (int i=0; i<accNames.length; i++) {
                     if (endPos>=accStart[i]&&startPos<=accEnd[i]) {
                         if (!withinSS.equals("")) {
                             withinSS=withinSS.concat(",");
                         }
-                        withinSS = withinSS.concat(exonNames[i+1]).concat("_acceptor");
+                        withinSS = withinSS.concat(accNames[i]).concat("_acceptor");
                     }
                 }
                 if (withinSS.equals("")) {
@@ -126,18 +129,21 @@ public static void main (String[] args) {
             geneName = split[3];
             geneEnd = Integer.parseInt(split[2]);
             geneChr = split[0];
-            if (split.length>5) {
-                String[] donStartStr=split[5].split(",");
-                String[] donEndStr=split[6].split(",");
-                String[] accStartStr=split[7].split(",");
-                String[] accEndStr=split[8].split(",");
+            if (split.length>6) {
+                String[] donStartStr=split[6].split(",");
+                String[] donEndStr=split[7].split(",");
+                String[] accStartStr=split[8].split(",");
+                String[] accEndStr=split[9].split(",");
                 for (int k=0; k<donStartStr.length; k++) {
                     donStart[k]=Integer.parseInt(donStartStr[k]);
                     donEnd[k]=Integer.parseInt(donEndStr[k]);
+                }
+                for (int k=0; k<accStartStr.length; k++) {
                     accStart[k]=Integer.parseInt(accStartStr[k]);
                     accEnd[k]=Integer.parseInt(accEndStr[k]);
                 }
-                exonNames=split[9].split(",");
+                donNames=split[10].split(",");
+                accNames=split[11].split(",");
             }
         }
         //update final line

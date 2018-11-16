@@ -18,8 +18,8 @@ public static void main(String[] args) {
         String[] splitScore = s.split("\\s+");
         s = splitScore[0];
 	    currentScore = Double.parseDouble(splitScore[1]);
-	    int leading = s.indexOf('h');
-        s=s.substring(leading-1);
+        int leading = s.indexOf('>');
+        s=s.substring(leading+1);
     	String refOrAlt = s.substring(s.length()-3);
         String donOrAcc = "MES"+s.substring(s.length()-6, s.length()-3);
     	//System.out.println("s...currentScore...refOrAlt...donOrAcc");
