@@ -63,10 +63,28 @@ elif [ ! -f "$ANNOTATION" ]; then
     echo "GTF annotation file not found: use -gtf path/to/gencodeXX.gtf\nExiting..."
     exit 1
 fi
+#check for consistenty in "chr" nomenlature
+gtfChr=$(tail -1 "$ANNOTATION" | awk '{print $1}' | grep chr)
+fastaChr=$(head -1 "$FASTAPATH" | awk '{print $1}' | grep chr)
+inputChr=$(tail -1 "$INPUTFILES" | awk '{print $1}' | grep chr)
+warningChr="Warning: it appears the provided gtf, fasta, and input files use inconsistent Chromosome nomenclature. Eg. \"chr1\" vs \"1\". This will likely cause issues. Please edit them for consistency"
+if [ "$gtfChr" == "" ]; then
+    if [ "$fastaChr" != "" ]; then
+        echo "$warningChr"
+    elif [ "$fastaChr" != "" ]; then
+        echo "$warningChr"
+    fi
+else
+    if [ "$fastaChr" == "" ]; then
+        echo "$warningChr"
+    elif [ "$fastaChr" == "" ]; then
+        echo "$warningChr"
+    fi
+fi
 #prepare splice site intervals from annotation.gtf
 if [ ! -f data/annotationIntervals.txt ] || [[ "$ANNOTATION" -nt data/annotationIntervals.txt ]] ; then
     echo "Preparing splice site annotation..."
-    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | java -cp bin getSpliceSiteIntervalsFromGTF > data/annotationIntervals.txt
+    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | java -cp bin getSpliceSiteIntervalsFromGTF > data/annotationIntervals.txt
 fi
 #for each file
 for FILE in $INPUTFILES; do
@@ -79,7 +97,14 @@ for FILE in $INPUTFILES; do
     grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt
+    intersectFile="temp/"$fileID"unstrandedInput.txt"
+    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
+    #sed -e 's/chr//' "$ANNOTATION" | grep '[[:blank:]]gene[[:blank:]]' | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt
+    #if [ -s temp/"$fileID"unstrandedInput.txt ]
+    if [ ! -s temp/"$fileID"unstrandedInput.txt ]; then
+        echo "Error: no variants were returned following bedtools intersect between input file and gtf. \n Exiting..."
+        exit 1
+    fi
     #generate flanking intervals.bed for bedtools getfasta
     if [ "$INPUTVCF" = "TRUE" ]; then
         grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $4, $5}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
@@ -90,18 +115,22 @@ for FILE in $INPUTFILES; do
     fi
     echo "Retrieving flanking FASTA sequence..."
     bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA
+    if [ ! -s temp/"$fileID"seqToScan.FASTA ]; then
+        echo "Error: no variants were returned following bedtools getfasta command. \n Exiting..."
+        exit 1
+    fi
     #seqScan: generates input strings for maxentscan and genesplicer as well as ESRseq scores
     echo "Scanning for motifs..."
     java -cp bin seqScan temp/"$fileID"seqToScan.FASTA -useESR $fileID 1>&2
     #run maxentscan
     echo "Running MaxEntScan..."
-    perl score5.pl temp/"$fileID"mesDonorInput.txt | java -cp bin processScoresMES > temp/"$fileID"mesDonorScores.txt
+    perl score5.pl temp/"$fileID"mesDonorInput.txt | tee temp/"$fileID"mesDonorInputUnprocessed.txt | java -cp bin processScoresMES > temp/"$fileID"mesDonorScores.txt
     retVal=( ${PIPESTATUS[0]} )
     if [ $retVal -ne 0 ]; then
         echo "MaxEntScan returned non-zero exit status. It is likely not all variants were processed. Exiting..."
     exit $retVal
     fi
-    perl score3.pl temp/"$fileID"mesAcceptorInput.txt | java -cp bin processScoresMES > temp/"$fileID"mesAcceptorScores.txt
+    perl score3.pl temp/"$fileID"mesAcceptorInput.txt | tee temp/"$fileID"mesAcceptorInputUnprocessed.txt | java -cp bin processScoresMES > temp/"$fileID"mesAcceptorScores.txt
     retVal=( ${PIPESTATUS[0]} )
     if [ $retVal -ne 0 ]; then
         echo "MaxEntScan returned non-zero exit status. It is likely not all variants were processed. Exiting..."
@@ -135,5 +164,5 @@ for FILE in $INPUTFILES; do
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/annotationIntervals.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
     #clean up temp files
-    rm temp/"$fileID"* 2> /dev/null
+    #rm temp/"$fileID"* 2> /dev/null
 done
