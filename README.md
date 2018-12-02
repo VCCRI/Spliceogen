@@ -9,6 +9,9 @@ Navigate to your desired installation directory and clone this repository:
 ```
 git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ```
+### Dependencies:
+-Bedtools
+
 ### Required annotation files:
 -Any whole genome fasta (.fa)
 
