@@ -51,7 +51,7 @@ Or for branchpointer_dev which handles both SNPs and indels, include the flag -b
 ### BED input:
 For BED inputs, replace the -inputVCF flag with -inputBED
 ## Output
-The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
+Final scores are outputted to the Spliceogen/output directory. The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
 
 ![alt text](https://github.com/VCCRI/Spliceogen/blob/master/toy.out.png)
 
