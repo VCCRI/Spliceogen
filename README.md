@@ -20,8 +20,6 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 Browse and download desired versions from [UCSC](hgdownload.soe.ucsc.edu/downloads.html#human/)
 and [Gencode](https://www.gencodegenes.org/human/)
 
-The "basic" gencode datasets are recommended. To focus on protein coding genes only, modify the GTF annotation by grepping for "protein_coding"
-
 Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 ```
 > wget ftp://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.alt.fa.gz
@@ -34,6 +32,8 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > cd path/to/Spliceogen
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
+### BED input:
+For BED inputs, replace the -inputVCF flag with -inputBED
 ### Including Branchpointer:
 To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
 ```
@@ -48,8 +48,6 @@ Currently, only the development version of Branchpointer supports indels. To ins
 Then to include Branchpointer predictions, include the flag -branchpointer
 
 Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
-### BED input:
-For BED inputs, replace the -inputVCF flag with -inputBED
 ## Output
 Final scores are outputted to the Spliceogen/output directory. The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
 
