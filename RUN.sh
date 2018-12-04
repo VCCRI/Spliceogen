@@ -55,7 +55,7 @@ case $key in
 esac
 done
 set - "${POSITIONAL[@]}"
-#input error handling
+#check input files exist and are not gzipped
 if [ ! -f $FASTAPATH ]; then
     echo -e "Fasta file not found: use -fasta ./path/to/hgXX.fa\nExiting..."
     exit 1
@@ -63,21 +63,27 @@ elif [ ! -f "$ANNOTATION" ]; then
     echo "GTF annotation file not found: use -gtf path/to/gencodeXX.gtf\nExiting..."
     exit 1
 fi
-#check for consistenty in "chr" nomenlature
+checkGzip=$( file --mime-type "$FASTAPATH" "$ANNOTATION" "$INPUTFILES" | grep gzip)
+if [ ! "$checkGzip" = "" ]; then
+    echo "Error: Input FASTA and GTF files must be unzipped. Exiting..."
+    exit 1
+fi
+#check input files for consistenty in "chr" nomenlature
 gtfChr=$(tail -1 "$ANNOTATION" | awk '{print $1}' | grep chr)
 fastaChr=$(head -1 "$FASTAPATH" | awk '{print $1}' | grep chr)
-inputChr=$(tail -1 "$INPUTFILES" | awk '{print $1}' | grep chr)
+firstInputFile=$(echo "$INPUTFILES" | awk '{print $1}')
+inputChr=$(tail -1 "$firstInputFile" | awk '{print $1}' | grep chr)
 warningChr="Warning: it appears the provided gtf, fasta, and input files use inconsistent Chromosome nomenclature. Eg. \"chr1\" vs \"1\". This will likely cause issues. Please edit them for consistency"
 if [ "$gtfChr" == "" ]; then
     if [ "$fastaChr" != "" ]; then
         echo "$warningChr"
-    elif [ "$fastaChr" != "" ]; then
+    elif [ "$inputChr" != "" ]; then
         echo "$warningChr"
     fi
 else
     if [ "$fastaChr" == "" ]; then
         echo "$warningChr"
-    elif [ "$fastaChr" == "" ]; then
+    elif [ "$inputChr" == "" ]; then
         echo "$warningChr"
     fi
 fi
@@ -86,9 +92,14 @@ if [ ! -f data/annotationIntervals.txt ] || [[ "$ANNOTATION" -nt data/annotation
     echo "Preparing splice site annotation..."
     grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | java -cp bin getSpliceSiteIntervalsFromGTF > data/annotationIntervals.txt
 fi
-#for each file
+#for each input VCF/BED file
 for FILE in $INPUTFILES; do
     fileID=$(echo "$FILE" | xargs -n 1 basename)
+    #check current file exists 
+    if [ ! -f "$FILE" ]; then
+        echo "Error: variant input file not found: $FILE \n Exiting..."
+        exit 1
+    fi
     echo "Input file: $fileID"
     #remove temp files from any previous run
     rm temp/"$fileID"* 2> /dev/null
@@ -97,12 +108,12 @@ for FILE in $INPUTFILES; do
     grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    intersectFile="temp/"$fileID"unstrandedInput.txt"
     grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
-    #sed -e 's/chr//' "$ANNOTATION" | grep '[[:blank:]]gene[[:blank:]]' | sort -k1,1 -k4,4n | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt
-    #if [ -s temp/"$fileID"unstrandedInput.txt ]
+    if [ $? -ne 0 ]; then
+        echo "Warning. Bedtools intersect returned non-zero exit status. Intersection failed between provided variant VCF/BED file and provided GTF. See above error message for more details"
+    fi
     if [ ! -s temp/"$fileID"unstrandedInput.txt ]; then
-        echo "Error: no variants were returned following bedtools intersect between input file and gtf. \n Exiting..."
+        echo "Error: no variants were returned following bedtools intersect between input file \""$fileID"\" and gtf. \n Exiting..."
         exit 1
     fi
     #generate flanking intervals.bed for bedtools getfasta
@@ -121,8 +132,9 @@ for FILE in $INPUTFILES; do
     fi
     #seqScan: generates input strings for maxentscan and genesplicer as well as ESRseq scores
     echo "Scanning for motifs..."
+    rm output/mesOmmitted/"$fileID" 2> /dev/null
     java -cp bin seqScan temp/"$fileID"seqToScan.FASTA -useESR $fileID 1>&2
-    #run maxentscan
+    #run maxEntScan and confirm non-zero exit, since invalid inputs cause it to exit early
     echo "Running MaxEntScan..."
     perl score5.pl temp/"$fileID"mesDonorInput.txt | tee temp/"$fileID"mesDonorInputUnprocessed.txt | java -cp bin processScoresMES > temp/"$fileID"mesDonorScores.txt
     retVal=( ${PIPESTATUS[0]} )
@@ -162,7 +174,7 @@ for FILE in $INPUTFILES; do
     fi
     #merge scores into one line
     echo "Processing scores..."
-    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/annotationIntervals.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
+    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/annotationIntervals.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
     #clean up temp files
     rm temp/"$fileID"* 2> /dev/null
 done

@@ -67,7 +67,7 @@ public static void scanStrings (String header, String s, String fileID) {
     */
     int flank = 68;
     int correct1 = 0;
-	s = s.toLowerCase();
+    s = s.toLowerCase();
 	String id = header.substring(0, header.indexOf(":"));
 	String[] sep = id.split(";");
 	String chr = sep[0].substring(1);
@@ -168,16 +168,9 @@ public static void scanStrings (String header, String s, String fileID) {
     }
     //ignore variants containing invalid fasta chars such as "n" which cause MaxEntScan to exit prematurely
     String nTest = altSeq.substring(17+flank-correct1-18, 41+flank-correct1+6+alt.length()).concat(ref).toUpperCase();
-    boolean illegalCharacters = false;
-    for (int k=0; k<nTest.length(); k++) {
-        char current = nTest.charAt(k);
-        if (current=='N'|| current==',') {
-            illegalCharacters=true;
-        }
-    }
-    if (illegalCharacters) {
+    if (containsIllegalFastaChar(nTest, nTest.length())) {
         if (!invalidFastaFound) {
-            System.out.println("Warning: variant(s) were omitted from MaxEntScan due to invalid character (usually \"n\") in FASTA sequence" + "\n" + "List of ommitted variants outputted to: data/"+fileID+"mesOmmitted.txt");  
+            System.out.println("Note: MaxEntScan cannot process FASTA sequences containing invalid characters (most commonly \"n\"). At least one variant has been omitted from MaxEntScan. IDs of ommitted variant(s) are listed in: Spliceogen/output/mesOmmitted/"+fileID);  
         }
         invalidFastaFound = true;
         appendOmmitted(id);
@@ -410,6 +403,16 @@ public static void resetOutputArrays() {
     System.gc();
 }
 
+public static boolean containsIllegalFastaChar(String s, int i) {
+    for (int k=0; k<i; k++) {
+        char current = s.toUpperCase().charAt(k);
+        if (current=='N'|| current==',') {
+            return true;
+        }
+    }
+    return false;
+}
+
 public static void appendToFiles () {
     String gsName = "temp/"+fileID+"gsInput.FASTA";
     String mesAccName = "temp/"+fileID+"mesAcceptorInput.txt";
@@ -427,14 +430,18 @@ public static void appendToFiles () {
         FileWriter fwMESacc = new FileWriter(mesAccName, true);
         BufferedWriter mesAccWriter = new BufferedWriter(fwMESacc);
         for (int i=0; i<mesIndexAcc; i++) {
-            mesAccWriter.write(mesOutputAcc[i]+"\n");
+            if (!containsIllegalFastaChar(mesOutputAcc[i], 23)) {
+                mesAccWriter.write(mesOutputAcc[i]+"\n");
+            }
         }
         mesAccWriter.close();
         //write maxEntScan Donor input to file
         FileWriter fwMESdon = new FileWriter(mesDonName, true);
         BufferedWriter mesDonWriter = new BufferedWriter(fwMESdon);
         for (int i=0; i<mesIndexDon; i++) {
-            mesDonWriter.write(mesOutputDon[i]+"\n");
+            if (!containsIllegalFastaChar(mesOutputDon[i], 9)) {
+                mesDonWriter.write(mesOutputDon[i]+"\n");
+            }
         }
         mesDonWriter.close();
         //write ESR output to file
@@ -451,9 +458,11 @@ public static void appendToFiles () {
 
 public static void appendOmmitted(String id) {
     try {
-        FileWriter fw = new FileWriter(id, true);
+        String fileName = "output/mesOmmitted/"+fileID;
+        FileWriter fw = new FileWriter(fileName, true);
         BufferedWriter writer = new BufferedWriter(fw);
         writer.write(id+"\n");
+        writer.close();
     } catch (IOException e) {
         System.out.println(e.getMessage());
     }

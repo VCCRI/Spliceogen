@@ -1,0 +1,1 @@
+#MaxEntScan exits early when it encounters illegal characters in a fasta (usually "N"). Often a small number of variants need to be excluded from maxEntScan for this reason. Lists of excluded variants are outputted to this directory. Do not remove
