@@ -1,3 +1,5 @@
+Contact: s.monger@victorchang.edu.au
+
 # Spliceogen
 Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates some of the individually best performing models for splice motif prediction: MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNPs and indels.
 ## Getting Started
@@ -7,6 +9,9 @@ Navigate to your desired installation directory and clone this repository:
 ```
 git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ```
+### Dependencies:
+-Bedtools
+
 ### Required annotation files:
 -Any whole genome fasta (.fa)
 
@@ -14,8 +19,6 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ### Downloading required files:
 Browse and download desired versions from [UCSC](hgdownload.soe.ucsc.edu/downloads.html#human/)
 and [Gencode](https://www.gencodegenes.org/human/)
-
-The "basic" gencode datasets are recommended. To focus on protein coding genes only, modify the GTF annotation by grepping for "protein_coding"
 
 Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 ```
@@ -29,6 +32,8 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > cd path/to/Spliceogen
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
+### BED input:
+For BED inputs, replace the -inputVCF flag with -inputBED
 ### Including Branchpointer:
 To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
 ```
@@ -43,10 +48,8 @@ Currently, only the development version of Branchpointer supports indels. To ins
 Then to include Branchpointer predictions, include the flag -branchpointer
 
 Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
-### BED input:
-For BED inputs, replace the -inputVCF flag with -inputBED
 ## Output
-The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
+Final scores are outputted to the Spliceogen/output directory. The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
 
 ![alt text](https://github.com/VCCRI/Spliceogen/blob/master/toy.out.png)
 
