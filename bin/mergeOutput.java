@@ -6,7 +6,7 @@ public static void main (String[] args) {
     try {
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     //print header
-    System.out.println("#CHR\t#START\t#REF\t#ALT\t#GENE\t#withinSite\t#mesDonRef\t#mesDonAlt\t#mesAccRef\t#mesAccAlt\t#gsDonRef\t#gsDonAlt\t#gsAccRef\t#gsAccAlt\t#ESEmaxRef\t#ESEmaxAlt\t#ESSminRef\t#ESSminAlt");
+    System.out.println("#CHR\tSTART\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt");
     //initialise score tracking variables
     String prevChr = "";
     int prevStart = -99;
