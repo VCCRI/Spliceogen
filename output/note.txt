@@ -1,1 +1,0 @@
-# final output files for each input vcf/bed are created in this directory, do not remove
