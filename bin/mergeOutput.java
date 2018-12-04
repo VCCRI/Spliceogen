@@ -6,7 +6,7 @@ public static void main (String[] args) {
     try {
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     //print header
-    System.out.println("#CHR\tSTART\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt");
+    System.out.println("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt");
     //initialise score tracking variables
     String prevChr = "";
     int prevStart = -99;
@@ -78,7 +78,7 @@ public static void main (String[] args) {
                 if (withinSS.equals("")) {
                     withinSS=".";
                 }
-                String[] id = { prevChr, Integer.toString(prevStart), prevRef, prevAlt, geneName, withinSS };
+                String[] id = { prevChr, Integer.toString(prevStart), Integer.toString(endPos), prevRef, prevAlt, geneName, withinSS };
                 printScores(id, scores);
             }
         }
@@ -175,7 +175,7 @@ public static void main (String[] args) {
                 scores[i]=".";
             }
         }
-        for (int i=0; i<6; i++) {
+        for (int i=0; i<7; i++) {
             System.out.print(id[i]+"\t");   
         }
         for (int i=0; i<11; i++) {
