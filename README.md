@@ -54,7 +54,7 @@ Final scores are outputted to the Spliceogen/output directory in a tab delimited
 ![alt text](https://github.com/VCCRI/Spliceogen/blob/master/toy.out.png)
 
 Columns for all possible scores are provided for each variant. Note that many missing scores are expected. Variants that fall within the donor/acceptor motif of an annotated exon are indicated by the "withinSite" column. Such variants have the potential to disrupt splicing by removing existing splice site motifs, detected by a decrease in score from ref->alt for MaxEntScan and Genesplicer. Conversely, variants outside splice sites have the potential to disrupt splicing by creating cryptic donor/acceptor motifs, detected by an increase in score from ref->alt.
-### Database
+## Database
 A genome-wide SNV database is available for download (https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts.
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
