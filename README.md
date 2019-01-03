@@ -33,7 +33,7 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
 ### BED input:
-For BED inputs, replace the -inputVCF flag with -inputBED
+For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
 ### Including Branchpointer:
 To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
 ```
