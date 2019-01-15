@@ -175,7 +175,7 @@ for FILE in $INPUTFILES; do
     fi
     #merge scores into one line
     echo "Processing scores..."
-    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
+    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
     #clean up temp files
     rm temp/"$fileID"* 2> /dev/null
 done
