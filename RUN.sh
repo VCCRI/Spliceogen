@@ -89,10 +89,10 @@ else
 fi
 #prepare splice site intervals from annotation.gtf
 gtfBasename=$(basename $ANNOTATION)
-if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
+#if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
     echo "Preparing splice site annotation..."
-    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | grep -v '^GL000' | java -cp bin getSpliceSiteIntervalsFromGTF > data/"$gtfBasename"_SpliceSiteIntervals.txt
-fi
+    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | grep -v '^GL000' | tee gtfInputFiltered.txt | java -cp bin getSpliceSiteIntervalsFromGTFupdatedMonday > data/"$gtfBasename"_SpliceSiteIntervals.txt
+#fi
 #for each input VCF/BED file
 for FILE in $INPUTFILES; do
     fileID=$(echo "$FILE" | xargs -n 1 basename)
@@ -175,7 +175,7 @@ for FILE in $INPUTFILES; do
     fi
     #merge scores into one line
     echo "Processing scores..."
-    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
+    time cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | tee teeTest.txt | java -cp bin mergeOutputUpdatedFriday > output/"$fileID"_out.txt
     #clean up temp files
-    rm temp/"$fileID"* 2> /dev/null
+    #rm temp/"$fileID"* 2> /dev/null
 done
