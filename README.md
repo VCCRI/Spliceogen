@@ -51,7 +51,7 @@ Or for branchpointer_dev which handles both SNPs and indels, include the flag -b
 ## Output
 Final scores are outputted to the Spliceogen/output directory in a tab delimited format suitable for ANNOVAR annotation. The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
 
-![alt text](https://github.com/VCCRI/Spliceogen/blob/master/toy.out.png)
+![alt text](https://github.com/VCCRI/Spliceogen/blob/master/sources/toy.out.png)
 
 Columns for all possible scores are provided for each variant. Note that many missing scores are expected. Variants that fall within the donor/acceptor motif of an annotated exon are indicated by the "withinSite" column. Such variants have the potential to disrupt splicing by removing existing splice site motifs, detected by a decrease in score from ref->alt for MaxEntScan and Genesplicer. Conversely, variants outside splice sites have the potential to disrupt splicing by creating cryptic donor/acceptor motifs, detected by an increase in score from ref->alt.
 ## Database
