@@ -4,8 +4,8 @@ POSITIONAL=()
 INPUTVCF="FALSE"
 INPUTBED="FALSE"
 INPUTFILES=""
-USEBP="FALSE"
-USEBPINDELS="FALSE"
+USEBP=""
+USEBPINDELS=""
 ANNOTATION=""
 FASTAPATH=""
 #parse command line args
@@ -46,8 +46,8 @@ case $key in
     USEBPINDELS="FALSE"
     shift ;;
     -branchpointerIndels)
+    USEBP="TRUE"
     USEBPINDELS="TRUE"
-    USEBP="FALSE"
     shift ;;
     *)
     POSITIONAL+=("$1")
@@ -89,10 +89,11 @@ else
 fi
 #prepare splice site intervals from annotation.gtf
 gtfBasename=$(basename $ANNOTATION)
-#if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
+if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
     echo "Preparing splice site annotation..."
-    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | grep -v '^GL000' | tee gtfInputFiltered.txt | java -cp bin getSpliceSiteIntervalsFromGTFupdatedMonday > data/"$gtfBasename"_SpliceSiteIntervals.txt
-#fi
+    grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | grep -v '^GL000' |
+    java -cp bin getSpliceSiteIntervalsFromGTF > data/"$gtfBasename"_SpliceSiteIntervals.txt
+fi
 #for each input VCF/BED file
 for FILE in $INPUTFILES; do
     fileID=$(echo "$FILE" | xargs -n 1 basename)
@@ -117,13 +118,13 @@ for FILE in $INPUTFILES; do
         echo "Error: no variants were returned following bedtools intersect between input file \""$fileID"\" and gtf. \n Exiting..."
         exit 1
     fi
-    #generate flanking intervals.bed for bedtools getfasta
+    #generate flanking intervals.bed for bedtools getfasta and branchpointer input
     if [ "$INPUTVCF" = "TRUE" ]; then
-        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $4, $5}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
-        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $4, $5}' | sort -u | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $4, $5}' | ( [[ "$USEBP" ]] && tee temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $4, $5}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
     elif [ "$INPUTBED" = "TRUE" ]; then
-        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $7, $8}' | sort -u | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
-        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | sort -u | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $7, $8}' | ( [[ "$USEBP" ]] && tee temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
     fi
     echo "Retrieving flanking FASTA sequence..."
     bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA
@@ -153,9 +154,9 @@ for FILE in $INPUTFILES; do
     echo "Running GeneSplicer..."
     bin/linux/genesplicerAdapted temp/"$fileID"gsInput.FASTA human > temp/"$fileID"gsScores.txt
     #run branchpointer SNPs
-    if [ "$USEBP" = "TRUE" ]; then
+    if [ "$USEBP" = "TRUE" -a "$USEBPINDELS" = "FALSE" ]; then
         echo "Running Branchpointer..."
-        Rscript --slave --vanilla bin/bpProcessing.R temp/"$fileID"input.txt $(pwd) "$BPGTF" &> output/"$fileID"bpLog.txt
+        Rscript --slave --vanilla bin/bpProcessing.R "$fileID" $(pwd) "$ANNOTATION" &> output/"$fileID"bpLog.txt
         #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $15, $16, $21, $22, $23, $24}' output/bpOutputSNPs.txt > output/bpSNPsSummarised.txt
     fi
     #run branchpointer indels
@@ -168,14 +169,15 @@ for FILE in $INPUTFILES; do
             if [ $altLength -gt 1 ] || [ $refLength -gt 1 ]; then
                 echo -e ".\t$chr\t$start\t$end\t$strand\t$ref\t$alt" >> temp/"$fileID"bpInputIndels.txt
             fi
-        done < temp/"$fileID"input.txt
-        Rscript --slave --vanilla bin/bpProcessingINDELS.R temp/"$fileID"input.txt temp/"$fileID"bpInputIndels.txt $(pwd) "$BPGTF" &> output/"$fileID"bpLog.txt
-        #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $16, $17, $23, $24, $25, $26}' output/bpOutputIndels.txt > output/bpIndelsSummarised.txt
-        #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $15, $16, $22, $23, $24, $25}' $SNPpath"bpOutput_SNPs.txt" > output/bpSNPsSummarised.txt
+        done < temp/"$fileID"bpInput.txt
+        Rscript --slave --vanilla bin/bpProcessingINDELS.R "$fileID" $(pwd) "$ANNOTATION" &> output/"$fileID"bpIndelLog.txt
+        #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $16, $17, $23, $24, $25, $26}' output/"$fileID"bpOutputIndels.txt > output/bpIndelsSummarised.txt
+        #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $15, $16, $22, $23, $24, $25}' output/"$fileID"bpOutputSNPs.txt" > output/bpSNPsSummarised.txt
     fi
     #merge scores into one line
     echo "Processing scores..."
-    time cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | awk '$3 = toupper($3)' | awk '$4 = toupper($4)' | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | tee teeTest.txt | java -cp bin mergeOutputUpdatedFriday > output/"$fileID"_out.txt
+    cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt |
+    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
     #clean up temp files
-    #rm temp/"$fileID"* 2> /dev/null
+    rm temp/"$fileID"* 2> /dev/null
 done
