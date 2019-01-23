@@ -166,7 +166,7 @@ public class mergeOutput {
 			                }
 			                geneName = updatedGeneName;
 			                geneEnd = updatedGeneEnd;
-			            } else if (!geneEnd.equals(".")) {    
+			            } else if (geneEnd.equals(".")) {    
 			                overlapTest = 0;
 			                geneEnd="0";
 			            } else if (!geneEnd.equals("")) {    
