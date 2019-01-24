@@ -121,10 +121,10 @@ for FILE in $INPUTFILES; do
     #generate flanking intervals.bed for bedtools getfasta and branchpointer input
     if [ "$INPUTVCF" = "TRUE" ]; then
         grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $4, $5}' | ( [[ "$USEBP" ]] && tee temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
-        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $4, $5}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $4, $5}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
     elif [ "$INPUTBED" = "TRUE" ]; then
         grep '[[:blank:]]+[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "+", $7, $8}' | ( [[ "$USEBP" ]] && tee temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
-        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals > temp/"$fileID"fastaIntervals.bed
+        grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
     fi
     echo "Retrieving flanking FASTA sequence..."
     bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA

@@ -116,6 +116,7 @@ public static void scanStrings (String header, String s, String fileID) {
 	}
 	//generate alt string
 	String altSeq = s.substring(0, 22 + flank) + alt + s.substring(22 + flank + ref.length());		
+	altSeq = altSeq.toLowerCase();
     //genesplicer fasta strings
     gsOutput[gsIndex]=">".concat(strand).concat(chr).concat(":").concat(start).concat(":").concat(refName).concat(":").concat(altName).concat(":GSREF");
     gsIndex++;
