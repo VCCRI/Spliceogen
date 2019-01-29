@@ -79,26 +79,30 @@ public class mergeOutput {
 		                if (prevAlt.equals("*")) {
 		                    endPos++;
 		                }
-			                for (int i=0; i<donNames.length; i++) {
-			                	if (donNames[i]==null) {
-			                		break;
-			                	}
-		                    if (endPos>=donStart[i]&&startPos<=donEnd[i]) {
-		                        if (!withinSS.equals("")) {
-		                            withinSS=withinSS.concat(",");
-		                        }
-		                        withinSS = withinSS.concat(donNames[i]).concat("_donor");
+			        for (int i=0; i<donNames.length; i++) {
+			            if (donNames[i]==null) {
+			                break;
+			            }
+				    if (!withinSS.contains(donNames[i])) {
+		                    	if (endPos>=donStart[i]&&startPos<=donEnd[i]) {
+		                            if (!withinSS.equals("")) {
+		                            	withinSS=withinSS.concat(",");
+		                            }
+		                            withinSS = withinSS.concat(donNames[i]).concat("_donor");
+					}
 		                    }
 		                }
 		                for (int i=0; i<accNames.length; i++) {
-		                	if (accNames[i]==null) {
-		                		break;
-		                	}
-		                    if (endPos>=accStart[i]&&startPos<=accEnd[i]) {
-		                        if (!withinSS.equals("")) {
-		                            withinSS=withinSS.concat(",");
-		                        }
-		                        withinSS = withinSS.concat(accNames[i]).concat("_acceptor");
+		                    if (accNames[i]==null) {
+		                	break;
+		                    }
+				    if (!withinSS.contains(accNames[i])) {
+		                    	if (endPos>=accStart[i]&&startPos<=accEnd[i]) {
+		                            if (!withinSS.equals("")) {
+		                                withinSS=withinSS.concat(",");
+		                            }
+		                            withinSS = withinSS.concat(accNames[i]).concat("_acceptor");
+					}
 		                    }
 		                }
 		                if (withinSS.equals("")) {
