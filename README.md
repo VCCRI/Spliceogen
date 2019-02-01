@@ -1,7 +1,7 @@
 Contact: s.monger@victorchang.edu.au
 
 # Spliceogen
-Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates some of the individually best performing models for splice motif prediction: MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNPs and indels.
+Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNPs and indels.
 ## Getting Started
 Instructions for installation and obtaining the required genome annotation files.
 ### Installation:
@@ -17,8 +17,7 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 
 -Any GTF genome annotation (.gtf)
 ### Downloading required files:
-Browse and download desired versions from [UCSC](hgdownload.soe.ucsc.edu/downloads.html#human/)
-and [Gencode](https://www.gencodegenes.org/human/)
+Browse and download FASTA/GTF versions from [Gencode]
 
 Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 ```
@@ -53,9 +52,9 @@ Final scores are outputted to the Spliceogen/output directory in a tab delimited
 
 ![alt text](https://github.com/VCCRI/Spliceogen/blob/master/sources/toy.out.png)
 
-Columns for all possible scores are provided for each variant. Note that many missing scores are expected. Variants that fall within the donor/acceptor motif of an annotated exon are indicated by the "withinSite" column. Such variants have the potential to disrupt splicing by removing existing splice site motifs, detected by a decrease in score from ref->alt for MaxEntScan and Genesplicer. Conversely, variants outside splice sites have the potential to disrupt splicing by creating cryptic donor/acceptor motifs, detected by an increase in score from ref->alt.
+Note that many missing scores are expected. Variants that fall within the donor/acceptor motif of an annotated exon are indicated by the "withinSite" column. Such variants have the potential to disrupt splicing by removing existing splice site motifs, detected by a decrease in score from ref->alt for MaxEntScan and Genesplicer. Conversely, variants outside splice sites have the potential to disrupt splicing by creating cryptic donor/acceptor motifs, detected by an increase in score from ref->alt.
 ## Database
-A genome-wide SNV database is available for download (https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts.
+A genome-wide SNV database is available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts. Both hg19 and hg38 are available.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
