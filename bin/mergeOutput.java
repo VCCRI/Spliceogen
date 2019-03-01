@@ -3,12 +3,18 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.jar.Attributes.Name;
 import java.lang.*;
+import java.text.DecimalFormat;
 public class mergeOutput {
 		
 			public static void main (String[] args) {
+                if (args.length < 1) {
+                    System.out.println("must provide input file as command line argument");
+                    System.exit(1);
+                }
+                String fileName=args[0];
+                printHeaders(fileName);
 			    try {
 			    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-				System.out.println("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt");
 			    //initialise score tracking variables
 			    String prevChr = "";
 			    int prevStart = -99;
@@ -109,7 +115,7 @@ public class mergeOutput {
 		                    withinSS=".";
 		                }
 		                String[] id = { prevChr, Integer.toString(prevStart), Integer.toString(endPos), prevRef, prevAlt, geneName, withinSS };
-		                printScores(id, scores);
+		                printScores(id, scores, fileName);
 		                //Reset scores
 			            Arrays.fill(scores, -99.0);
 			        }
@@ -257,21 +263,185 @@ public class mergeOutput {
 				e.printStackTrace();
 			}
 		}
+/*
+    public static void printScores(String[] id , double[] s) {
+        String[] scores = new String[12];
+        for (int i=0; i<12; i++) {
+            scores[i]=Double.toString(s[i]);
+            if (scores[i].equals("-99.0") || scores[i].equals("0.0")) {
+                scores[i]=".";
+            }
+        }
+        for (int i=0; i<7; i++) {
+            System.out.print(id[i]+"\t");   
+        }
+        for (int i=0; i<12; i++) {
+            System.out.print(scores[i]+"\t");
+        }
+        System.out.println(calculateLogRegScores(s));        
+    }
+*/
+    public static void printScores(String[] id , double[] s, String fileName) {
+        String line = "";
+        String[] out = new String[21];
+        for (int i=0; i<7; i++) {
+            out[i]=id[i];   
+        }
+        for (int i=0; i<12; i++) {
+            if (s[i]==-99 || s[i]==0) {
+                out[i+7]=".";
+            } else {
+                out[i+7]=Double.toString(s[i]);
+            }
+        }
+        String[] lrScores = calculateLogRegScores(s).split("\\s+");
+        out[19]= lrScores[0];                
+        out[20]= lrScores[1];                
+    //append to files
+    String annovarName = "output/"+fileName+"_out.txt";
+    String accName = "temp/"+fileName+"_acceptorCreating_unsorted.txt";
+    String donName = "temp/"+fileName+"_donorCreating_unsorted.txt";
+    String withinSSname = "temp/"+fileName+"_withinSS_unsorted.txt";
+    try {
+        //write full line for annovar
+        FileWriter fwAV = new FileWriter(annovarName, true);
+        BufferedWriter avWriter = new BufferedWriter(fwAV);
+        for (int i=0; i<out.length-1; i++) {
+            avWriter.write(out[i]+"\t");
+        }
+        avWriter.write(out[out.length-1]+"\n");
+        avWriter.close();
+        //write withinSS
+        if (out[6].contains("ENSE")) {
+            FileWriter fwSS = new FileWriter(withinSSname, true);
+            BufferedWriter ssWriter = new BufferedWriter(fwSS);
+            for (int i=0; i<16; i++) {
+                ssWriter.write(out[i]+"\t");
+            }
+            double maxScoreDecrease = -99;
+            //if donor
+            if (out[6].contains("_donor")) {
+                if (!out[7].equals(".") && !out[8].equals(".")) {
+                    maxScoreDecrease = s[0] - s[1]; 
+                }
+            }
+            //if acceptor
+            if (out[6].contains("_acceptor")) {
+                if (!out[9].equals(".") && !out[10].equals(".")) {
+                    if (maxScoreDecrease < s[2] - s[3] ) {
+                        maxScoreDecrease = s[2] - s[3]; 
+                    }
+                }
+            }
+            ssWriter.write(maxScoreDecrease+"\n");
+            ssWriter.close();
+        } else {
+            //write donCreating
+            if (Double.parseDouble(out[19])>=0.7) {
+                FileWriter fwDon = new FileWriter(donName, true);
+                BufferedWriter donWriter = new BufferedWriter(fwDon);
+                for (int i=0; i<6; i++) {
+                    donWriter.write(out[i]+"\t");
+                }
+                donWriter.write(out[7]+"\t"+out[8]+"\t"+out[11]+"\t"+out[12]+"\t"+out[19]+"\n");
+                donWriter.close();
+            }
+            //write accCreating
+            if (Double.parseDouble(out[20])>=0.7) {
+                FileWriter fwAcc = new FileWriter(accName, true);
+                BufferedWriter accWriter = new BufferedWriter(fwAcc);
+                for (int i=0; i<6; i++) {
+                    accWriter.write(out[i]+"\t");
+                }
+                accWriter.write(out[9]+"\t"+out[10]+"\t"+out[13]+"\t"+out[14]+"\t"+out[20]+"\n");
+                accWriter.close();
+            }
+        }
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
+    }
+}    
 
-			    public static void printScores(String[] id , double[] s) {
-			        String[] scores = new String[12];
-			        for (int i=0; i<12; i++) {
-			            scores[i]=Double.toString(s[i]);
-			            if (scores[i].equals("-99.0") || scores[i].equals("0.0")) {
-			                scores[i]=".";
+                public static String calculateLogRegScores (double[] s) {
+                      //impute missing values
+                    //maxEntScan
+                    for (int i=0; i<4; i++) {
+			            if (s[i]==-99.0 | s[i]==0.0) {
+			                s[i] = -20.0;
 			            }
-			        }
-			        for (int i=0; i<7; i++) {
-			            System.out.print(id[i]+"\t");   
-			        }
-			        for (int i=0; i<11; i++) {
-			            System.out.print(scores[i]+"\t");
-			        }
-			        System.out.println(scores[11]);        
-			    }
-			}
+                    }                    
+                    //gsDonRef
+			        if (s[4]==-99.0 | s[4]==0.0) {
+			            if (s[5]==-99.0 | s[5]==0.0) {
+			                s[4]=0.0;
+                            s[5]=0.0;
+                        } else {
+                            s[4]=-3.0;
+                        }
+			        } else
+                    //gsDonAlt
+			        if (s[7]==-99.0 | s[7]==0.0) {
+                        s[7]=-3.0;
+                    }
+                    //gsAccRef
+			        if (s[6]==-99.0 | s[6]==0.0) {
+			            if (s[7]==-99.0 | s[7]==0.0) {
+			                s[6]=0.0;
+                            s[7]=0.0;
+                        } else {
+                            s[6]=-3.0;
+                        }
+			        } else
+                    //gsAccAlt
+			        if (s[7]==-99.0 | s[7]==0.0) {
+                        s[7]=-3.0;
+                    }
+                    double mesDonChange = s[1] - s[0];
+                    double mesAccChange = s[3] - s[2];
+                    double gsDonChange = s[5] - s[4];
+                    double gsAccChange = s[7] - s[6];
+			        // calculate p = 1/(1+e^-(a + b1X1 + b2X2 + ... + bnXn))
+			        double pDon = 1/(1 + Math.exp(-(-0.9865 + (mesDonChange * 0.1129) + (gsDonChange * 0.01151) + (s[1] * 0.2076) + (s[5] * 0.4350) )));
+			        double pAcc = 1/(1 + Math.exp(-(-1.665 + (mesAccChange * 0.3323) + (gsAccChange * 0.05084) + (s[3] * 0.1877) + (s[7] * 0.1730) )));
+			        //double pDon = 1/(1 + Math.exp(-(-0.8440 + (mesDonChange * 0.09236) + (gsDonChange * -0.05291) + (s[1] * 0.2053) + (s[5] * 0.4548) )));
+			        //double pAcc = 1/(1 + Math.exp(-(-1.615 + (mesAccChange * 0.3256) + (gsAccChange * 0.09301) + (s[3] * 0.1879) + (s[7] * 0.1311) )));
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    pDon = Double.valueOf(df.format(pDon));
+                    pAcc = Double.valueOf(df.format(pAcc));
+                    String ret = Double.toString(pDon) + "\t" + Double.toString(pAcc);
+                    return ret;
+                }
+
+
+    public static void printHeaders(String fileName) {
+    String annovarName = "output/"+fileName+"_out.txt";
+    String accName = "output/"+fileName+"_acceptorCreating.txt";
+    String donName = "output/"+fileName+"_donorCreating.txt";
+    String withinSSname = "output/"+fileName+"_withinSS.txt";
+    try {
+        //annovar
+        FileWriter fwAV = new FileWriter(annovarName);
+        BufferedWriter avWriter = new BufferedWriter(fwAV);
+        avWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt\tdonCreateP\taccCreateP"+"\n");
+        avWriter.close();
+        //withinSS
+        FileWriter fwSS = new FileWriter(withinSSname);
+        BufferedWriter ssWriter = new BufferedWriter(fwSS);
+        ssWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt"+"\n");
+        ssWriter.close();
+        //donCreating
+        FileWriter fwDon = new FileWriter(donName);
+        BufferedWriter donWriter = new BufferedWriter(fwDon);
+        donWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\tmesDonRef\tmesDonAlt\tgsDonRef\tgsDonAlt\tdonCreateP"+"\n");
+        donWriter.close();
+        //accCreating
+        FileWriter fwAcc = new FileWriter(accName);
+        BufferedWriter accWriter = new BufferedWriter(fwAcc);
+        accWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\tmesAccRef\tmesAccAlt\tgsAccRef\tgsAccAlt\taccCreateP"+"\n");
+        accWriter.close();
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
+    }
+}    
+
+}

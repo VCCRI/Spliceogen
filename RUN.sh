@@ -1,4 +1,25 @@
 #!/bin/bash
+function printVersion {
+    printf "Spliceogen 1.0 1-March-2019\n"
+}
+function printHelp {
+    cat <<-END
+Usage:
+------
+3 required args:
+1)  -inputVCF path/to/VCF/input(s).VCF
+        OR
+    -inputBED path/to/input(s).BED 
+        Note: wildcard matching of multiple files is allowed
+2)  -gtf path/to/annotation.GTF
+3)  -fasta path/to/genome.fasta
+optional arg:
+4)  -branchpointer hgXX
+        OR
+    -branchpointerIndels hgXX
+        Note: user must specify hg19 or hg38
+END
+}
 #set default parameters
 POSITIONAL=()
 INPUTVCF="FALSE"
@@ -8,11 +29,20 @@ USEBP=""
 USEBPINDELS=""
 ANNOTATION=""
 FASTAPATH=""
+GENOMEBUILD=""
 #parse command line args
 while [[ $# -gt 0 ]]
 do
 key="$1"
 case $key in
+    -h|--help)
+    printHelp
+    exit 0
+    ;;
+    -v|--version)
+    printVersion
+    exit 0
+    ;;
     -inputVCF)
     INPUTVCF="TRUE"
     INPUTFILES="$2"
@@ -42,12 +72,16 @@ case $key in
     shift
     shift ;;
     -branchpointer)
+    GENOMEBUILD="$2"
     USEBP="TRUE"
     USEBPINDELS="FALSE"
+    shift
     shift ;;
     -branchpointerIndels)
+    GENOMEBUILD="$2"
     USEBP="TRUE"
     USEBPINDELS="TRUE"
+    shift
     shift ;;
     *)
     POSITIONAL+=("$1")
@@ -89,11 +123,11 @@ else
 fi
 #prepare splice site intervals from annotation.gtf
 gtfBasename=$(basename $ANNOTATION)
-#if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
+if [ ! -f data/"$gtfBasename"_SpliceSiteIntervals.txt ] || [[ "$ANNOTATION" -nt data/"$gtfBasename"_SpliceSiteIntervals.txt ]] ; then
     echo "Preparing splice site annotation..."
     grep '[[:blank:]]gene[[:blank:]]\|[[:blank:]]transcript[[:blank:]]\|[[:blank:]]exon[[:blank:]]' "$ANNOTATION" | grep -v '^GL000' |
     java -cp bin getSpliceSiteIntervalsFromGTF > data/"$gtfBasename"_SpliceSiteIntervals.txt
-#fi
+fi
 #for each input VCF/BED file
 for FILE in $INPUTFILES; do
     fileID=$(echo "$FILE" | xargs -n 1 basename)
@@ -108,6 +142,12 @@ for FILE in $INPUTFILES; do
     #sort body of input file
     grep "^#" "$FILE" > temp/"$fileID"_sorted
     grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
+    #check bedtools is installed
+    bedtoolsLocation=$(command -v docker);
+    if [ "$bedtoolsLocation" != "" ]; then
+        printf -- 'Warning: Bedtools does not appear to be installed.\n';
+        printf -- 'Get it here: https://bedtools.readthedocs.io/en/latest/content/installation.html\n';
+    fi;
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
     grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | grep -v '^GL000' | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
@@ -156,7 +196,7 @@ for FILE in $INPUTFILES; do
     #run branchpointer SNPs
     if [ "$USEBP" = "TRUE" -a "$USEBPINDELS" = "FALSE" ]; then
         echo "Running Branchpointer..."
-        Rscript --slave --vanilla bin/bpProcessing.R "$fileID" $(pwd) "$ANNOTATION" &> output/"$fileID"bpLog.txt
+        Rscript --slave --vanilla bin/bpProcessing.R "$fileID" $(pwd) "$ANNOTATION" "$GENOMEBUILD" &> output/"$fileID"bpLog.txt
         #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $15, $16, $21, $22, $23, $24}' output/bpOutputSNPs.txt > output/bpSNPsSummarised.txt
     fi
     #run branchpointer indels
@@ -170,14 +210,30 @@ for FILE in $INPUTFILES; do
                 echo -e ".\t$chr\t$start\t$end\t$strand\t$ref\t$alt" >> temp/"$fileID"bpInputIndels.txt
             fi
         done < temp/"$fileID"bpInput.txt
-        Rscript --slave --vanilla bin/bpProcessingINDELS.R "$fileID" $(pwd) "$ANNOTATION" &> output/"$fileID"bpIndelLog.txt
+        Rscript --slave --vanilla bin/bpProcessingINDELS.R "$fileID" $(pwd) "$ANNOTATION" "$GENOMEBUILD" &> output/"$fileID"bpIndelLog.txt
         #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $16, $17, $23, $24, $25, $26}' output/"$fileID"bpOutputIndels.txt > output/bpIndelsSummarised.txt
         #awk -v OFS=\\t '{print $2, $3, $4, $8, $9, $15, $16, $22, $23, $24, $25}' output/"$fileID"bpOutputSNPs.txt" > output/bpSNPsSummarised.txt
     fi
     #merge scores into one line
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt |
-    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput > output/"$fileID"_out.txt
+    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
+    #sort predictions
+    if [ -f temp/"$fileID"_donorCreating_unsorted.txt ]; then
+        sort -gr -k11,11 temp/"$fileID"_donorCreating_unsorted.txt >> output/"$fileID"_donorCreating.txt
+    else
+        rm output/"$fileID"_donorCreating.txt
+    fi 
+    if [ -f temp/"$fileID"_acceptorCreating_unsorted.txt ]; then
+        sort -gr -k11,11 temp/"$fileID"_acceptorCreating_unsorted.txt >> output/"$fileID"_acceptorCreating.txt
+    else
+        rm output/"$fileID"_acceptorCreating.txt
+    fi 
+    if [ -f temp/"$fileID"_withinSS_unsorted.txt ]; then
+        sort -gr -k17,17 temp/"$fileID"_withinSS_unsorted.txt | cut -f1-15 >> output/"$fileID"_withinSS.txt
+    else
+        rm output/"$fileID"_withinSS.txt
+    fi 
     #clean up temp files
-    rm temp/"$fileID"* 2> /dev/null
+    #rm temp/"$fileID"* 2> /dev/null
 done
