@@ -17,7 +17,7 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 
 -Any GTF genome annotation (.gtf)
 ### Downloading required files:
-Browse and download FASTA/GTF versions from [Gencode]
+Browse and download FASTA/GTF versions from [Gencode](https://www.gencodegenes.org/human/)
 
 Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 ```
