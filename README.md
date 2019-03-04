@@ -14,7 +14,7 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 -Bedtools
 
 ### Required annotation files:
--Any whole genome fasta (.fa)
+-Any whole genome FASTA (.fa)
 
 -Any GTF genome annotation (.gtf)
 ### Downloading required files:
