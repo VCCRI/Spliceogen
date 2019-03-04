@@ -14,8 +14,6 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 
 -Additional packages are required in order to include optional Branchpointer predictions (see "Including Branchpointer")
 
--Alternatively, a docker image is available.
-
 ### Required annotation files:
 -Any whole genome fasta (.fa)
 
@@ -30,11 +28,19 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
-## Basic Usage:
+## Running Spliceogen
+
+### Basic Usage:
 ```
 > cd path/to/Spliceogen
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
+Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output format. Run this small example using the following command:
+
+```
+> ./RUN.sh -inputVCF toy/toy.vcf -gtf toy/toy.gtf -fasta toy/toy.fa
+```
+
 ### BED input:
 For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
 ### Including Branchpointer:
@@ -100,7 +106,11 @@ All scores and predictions can be found in the Spliceogen/output directory in a 
     Contains Branchpointer prediction scores, including whether the variant is predicted to create or remove a branchpoint, based on the recommended Branchpointer thresholds.
 
 ## Database
-A genome-wide SNV database is available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts. Both hg19 and hg38 are available.
+Genome-wide SNV databases are available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). These cover all possible SNVs at every genomic position within all protein-coding multi-exon transcripts (based on Gencode v29). Both hg19 and hg38 are available.
+
+An extensive version of the database containing MaxEntScan, GeneSplicer and ESRseq prediction scores for every possible SNV is available.
+
+Alternatively, for users only interested in identifying variants which disrupt or create donor/acceptor motifs (and not silencer/enhancer predictions), a much leaner version of the database is provided. This version includes donor/acceptor predictions for all SNVs within splice sites, as well as all SNVs outside of splice sites that are likely to create donor/acceptor motifs. The database size is vastly reduced by excluding the large majority of SNVs which do not overlap splice sites and are not predicted to create a donor/acceptor motif.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
