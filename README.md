@@ -12,8 +12,6 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ### Dependencies:
 -Bedtools
 
--Additional packages are required in order to include optional Branchpointer predictions (see "Including Branchpointer")
-
 ### Required annotation files:
 -Any whole genome fasta (.fa)
 
@@ -28,6 +26,21 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
+### Including Branchpointer:
+To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
+```
+> source("https://bioconductor.org/biocLite.R")
+> biocLite("branchpointer")
+```
+Currently, only the development version of Branchpointer supports indels. To install this version instead:
+```
+> library(devtools)
+> install_github("betsig/branchpointer_dev")
+```
+Then to include Branchpointer predictions, include the flag -branchpointer
+
+Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
+
 ## Running Spliceogen
 
 ### Basic Usage:
@@ -43,20 +56,6 @@ Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output
 
 ### BED input:
 For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
-### Including Branchpointer:
-To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
-```
-> source("https://bioconductor.org/biocLite.R")
-> biocLite("branchpointer")
-```
-Currently, only the development version of Branchpointer supports indels. To install this version instead:
-```
-> library(devtools)
-> install_github("betsig/branchpointer_dev")
-```
-Then to include Branchpointer predictions, include the flag -branchpointer
-
-Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
 ## Output
 
 ### Column labels:
