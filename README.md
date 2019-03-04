@@ -10,9 +10,6 @@ Navigate to your desired installation directory and clone this repository:
 ```
 git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ```
-### Dependencies:
--Bedtools
-
 ### Required annotation files:
 -Any whole genome FASTA (.fa)
 
@@ -27,20 +24,30 @@ Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
-### Including Branchpointer:
-To include Branchpointer predictions for SNPs, the package must first be installed from an R command prompt.
+### Dependencies:
+-Bedtools
+
+### Branchpointer dependencies:
+To include (optional) Branchpointer predictions, users require R, as well as Branchpointer and BSgenome packages installed.
+
+The current Bioconductor release of Branchpointer supports SNV predictions. To install it from an R prompt:
+
 ```
 > source("https://bioconductor.org/biocLite.R")
 > biocLite("branchpointer")
 ```
-Currently, only the development version of Branchpointer supports indels. To install this version instead:
+The current development version of Branchpointer also supports indels. To install this version instead:
 ```
 > library(devtools)
 > install_github("betsig/branchpointer_dev")
 ```
-Then to include Branchpointer predictions, include the flag -branchpointer
+From an R prompt, install the hg38 BSgenomes package using the below command. For hg19, edit the 3rd line to "hg19".
 
-Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
+```
+> if (!requireNamespace("BiocManager", quietly = TRUE))
+>     install.packages("BiocManager")
+> BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", version = "3.8")
+```
 
 ## Running Spliceogen
 
@@ -57,6 +64,15 @@ Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output
 
 ### BED input:
 For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
+
+### Including Branchpointer:
+To include Branchpointer predictions, include the branchpointer flag and specify the genome build-branchpointer
+
+```
+> -branchpointer hgXX
+```
+Or for branchpointer_dev which handles both SNPs and indels, use the flag -branchpointerIndels hgXX
+
 ## Output
 
 ### Column labels:
