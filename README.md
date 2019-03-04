@@ -81,23 +81,23 @@ All scores and predictions can be found in the Spliceogen/output directory in a 
 
 1) "$file"_out.txt:
 
-...Contains all scores generated for every variant, sorted in ascending chromosomal/start position order.
+⋅⋅⋅Contains all scores generated for every variant, sorted in ascending chromosomal/start position order.
 
 2) "$file"_withinSS.txt:
 
-...Contains all variants that overlap annotated splice sites, alongside relevant scores and gene/exon information. Variants are sorted by donor/acceptor score decrease, such that the variants most likely to disrupt existing donor/acceptor splice sites appear at the top of this file.
+⋅⋅⋅Contains all variants that overlap annotated splice sites, alongside relevant scores and gene/exon information. Variants are sorted by donor/acceptor score decrease, such that the variants most likely to disrupt existing donor/acceptor splice sites appear at the top of this file.
 
 3) "$file"_donorCreating.txt
 
-...Contains variants outside of existing splice sites that are predicted to create donor motifs, ranked by P value, based on a logistic regression model of the MaxEntScan and GeneSplicer scores of known donor creating variants (discussed below)
+⋅⋅⋅Contains variants outside of existing splice sites that are predicted to create donor motifs, ranked by P value, based on a logistic regression model of the MaxEntScan and GeneSplicer scores of known donor creating variants (discussed below)
 
 4) "$file"_acceptorCreating.txt
 
-...Same as above, but for acceptor creating variants.
+⋅⋅⋅Same as above, but for acceptor creating variants.
 
 5) "$file"_bpOutput.txt
 
-...Contains Branchpointer prediction scores, including whether the variant is predicted to create or remove a branchpoint, based on the recommended Branchpointer thresholds.
+⋅⋅⋅Contains Branchpointer prediction scores, including whether the variant is predicted to create or remove a branchpoint, based on the recommended Branchpointer thresholds.
 
 ## Database
 A genome-wide SNV database is available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts. Both hg19 and hg38 are available.
