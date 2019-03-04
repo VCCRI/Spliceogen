@@ -11,7 +11,9 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ```
 ### Dependencies:
 -Bedtools
+
 -Additional packages are required in order to include optional Branchpointer predictions (see "Including Branchpointer")
+
 -Alternatively, a docker image is available.
 
 ### Required annotation files:
@@ -56,12 +58,19 @@ Or for branchpointer_dev which handles both SNPs and indels, include the flag -b
 The following key should help to clarify any unknown abbreviations in the output column labels
 
 mes = MaxEntScan
+
 gs = GeneSplicer
+
 don = Donor
+
 acc = Acceptor
+
 ref = Reference allele
+
 alt = Alternative allele
+
 ESS = Silencer (ESRseq)
+
 ESE = Enhancer (ESRseq)
 
 So for example, "gsDonRef" is the GeneSplicer score representing donor motif strength for the reference sequence, whereas "mesDonAlt" is the MaxEntScan score representing acceptor motif strength for the alternative sequence.
