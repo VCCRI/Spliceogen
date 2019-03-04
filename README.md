@@ -11,6 +11,8 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 ```
 ### Dependencies:
 -Bedtools
+-Additional packages are required in order to include optional Branchpointer predictions (see "Including Branchpointer")
+-Alternatively, a docker image is available.
 
 ### Required annotation files:
 -Any whole genome fasta (.fa)
@@ -48,11 +50,36 @@ Then to include Branchpointer predictions, include the flag -branchpointer
 
 Or for branchpointer_dev which handles both SNPs and indels, include the flag -branchpointerIndels 
 ## Output
-Final scores are outputted to the Spliceogen/output directory in a tab delimited format suitable for ANNOVAR annotation. The following example output was generated using the provided input file "toy.vcf" and invoked with the "basic usage" command shown above.
 
-![alt text](https://github.com/VCCRI/Spliceogen/blob/master/sources/toy.out.png)
+### Column labels:
 
-Note that many missing scores are expected. Variants that fall within the donor/acceptor motif of an annotated exon are indicated by the "withinSite" column. Such variants have the potential to disrupt splicing by removing existing splice site motifs, detected by a decrease in score from ref->alt for MaxEntScan and Genesplicer. Conversely, variants outside splice sites have the potential to disrupt splicing by creating cryptic donor/acceptor motifs, detected by an increase in score from ref->alt.
+The following key should help to clarify any unknown abbreviations in the output column labels
+
+mes = MaxEntScan
+gs = GeneSplicer
+don = Donor
+acc = Acceptor
+ref = Reference allele
+alt = Alternative allele
+ESS = Silencer (ESRseq)
+ESE = Enhancer (ESRseq)
+
+So for example, "gsDonRef" is the GeneSplicer score representing donor motif strength for the reference sequence, whereas "mesDonAlt" is the MaxEntScan score representing acceptor motif strength for the alternative sequence.
+
+### Output Files
+
+All scores and predictions can be found in the Spliceogen/output directory in a tab delimited format suitable for ANNOVAR annotation. Multiple output files are provided for each input VCF/BED. This includes one master file containing all scores for all variants, as well as several additional files containing only variants identified as most likely to be disruptive, ranked in descending order. The specific files generated are as follows:
+
+1) "$file"_out.txt:	Contains all scores generated for every variant, sorted in ascending chromosomal/start position order.
+
+2) "$file"_withinSS.txt:	Contains all variants that overlap annotated splice sites, alongside relevant scores and gene/exon information. Variants are sorted by donor/acceptor score decrease, such that the variants most likely to disrupt existing donor/acceptor splice sites appear at the top of this file.
+
+3) "$file"_donorCreating.txt	Contains variants outside of existing splice sites that are predicted to create donor motifs, ranked by P value, based on a logistic regression model of the MaxEntScan and GeneSplicer scores of known donor creating variants (discussed below)
+
+4) "$file"_acceptorCreating.txt		Same as above, but for acceptor creating variants.
+
+5) "$file"_bpOutput.txt			Contains Branchpointer prediction scores, including whether the variant is predicted to create or remove a branchpoint, based on the recommended Branchpointer thresholds.
+
 ## Database
 A genome-wide SNV database is available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). It contains MaxEntScan, GeneSplicer and ESRseq prediction scores for all possible variants at every genomic position within all gencode-annotated multi-exon transcripts. Both hg19 and hg38 are available.
 
