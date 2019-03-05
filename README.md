@@ -66,7 +66,7 @@ Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output
 For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
 
 ### Including Branchpointer:
-To include Branchpointer predictions, include the branchpointer flag and specify the genome build-branchpointer
+To include Branchpointer predictions, include the branchpointer flag and specify the genome build:
 
 ```
 > -branchpointer hgXX
@@ -77,7 +77,7 @@ Or for branchpointer_dev which handles both SNPs and indels, use the flag -branc
 
 ### Column labels:
 
-The following abbreviations are used in the output header:
+The following abbreviations are used in the output headers:
 
 mes = MaxEntScan
 
@@ -95,6 +95,8 @@ ESS = Silencer (ESRseq)
 
 ESE = Enhancer (ESRseq)
 
+withinSS = within splice site
+
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
 ### Output Files
@@ -107,11 +109,11 @@ All scores and predictions can be found in the Spliceogen/output directory in a 
 
 2) "$file"_withinSS.txt:
 
-    Contains all variants that overlap annotated splice sites, alongside relevant scores and gene/exon information. Variants are sorted by donor/acceptor score decrease, such that the variants most likely to disrupt existing donor/acceptor splice sites appear at the top of this file.
+    Contains all variants that overlap annotated splice sites. The overlapping splice sites are denoted by their exonID and "\_donor" or "\_acceptor". Variants are sorted by donor/acceptor score decrease, such that the variants most likely to disrupt existing donor/acceptor splice sites appear at the top of this file.
 
 3) "$file"_donorCreating.txt
 
-    Contains variants outside of existing splice sites that are predicted to create donor motifs, ranked by P value, based on a logistic regression model of the MaxEntScan and GeneSplicer scores of known donor creating variants (discussed below)
+    Contains variants outside of existing splice sites that are predicted to create donor motifs, ranked by P value, based on a logistic regression model of the MaxEntScan and GeneSplicer scores of known donor creating variants derived from Shiraishi et al., 2018<sup>5</sup>.
 
 4) "$file"_acceptorCreating.txt
 
@@ -126,13 +128,15 @@ Genome-wide SNV databases are available for [download](https://github.com/VCCRI/
 
 An extensive version of the database containing MaxEntScan, GeneSplicer and ESRseq prediction scores for every possible SNV is available.
 
-Alternatively, for users only interested in identifying variants which disrupt or create donor/acceptor motifs (and not silencer/enhancer predictions), a much leaner version of the database is provided. This version includes donor/acceptor predictions for all SNVs within splice sites, as well as all SNVs outside of splice sites that are likely to create donor/acceptor motifs. The database size is vastly reduced by excluding the large majority of SNVs which do not overlap splice sites and are not predicted to create a donor/acceptor motif.
+Alternatively, for users only interested in identifying variants which disrupt or create donor/acceptor motifs (and not silencer/enhancer predictions), a leaner version of the database is provided. This version includes donor/acceptor predictions for all SNVs within splice sites, as well as all SNVs outside of splice sites that are likely to create donor/acceptor motifs. The database size is vastly reduced by excluding the large majority of SNVs which do not overlap splice sites and are not predicted to create a donor/acceptor motif.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
 
 2. Pertea, M., Lin, X., Salzberg, S., "GeneSplicer: a new computational method for splice site prediction", Nucleic Acids Res. 2001; 29(5):1185-90
 
-3. Shendong, K., et al., "Quantitative evaluation of all hexamers as exonic splicing elements", Genome Res. 2011; 21(8): 1360-1374
+3. Shendong, K., et al., "Quantitative evaluation of all hexamers as exonic splicing elements", Genome Res. 2011; 21(8):1360-1374
 
 4. Signal, B., et al., "Machine learning annotation of human branchpoints", Bioinformatics. 2018; 34(6):920-927
+
+5. Shiraishi, Y., et al., "A comprehensive characterization of cis-acting splicing-associated variants in human cancer", Genome Res. 2018; 28(8):1111-1125
