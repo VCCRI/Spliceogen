@@ -130,6 +130,12 @@ An extensive version of the database containing MaxEntScan, GeneSplicer and ESRs
 
 Alternatively, for users only interested in identifying variants which disrupt or create donor/acceptor motifs (and not silencer/enhancer predictions), a leaner version of the database is provided. This version includes donor/acceptor predictions for all SNVs within splice sites, as well as all SNVs outside of splice sites that are likely to create donor/acceptor motifs. The database size is vastly reduced by excluding the large majority of SNVs which do not overlap splice sites and are not predicted to create a donor/acceptor motif.
 
+## Scalability
+
+Spliceogen is highly scalable, so we recommend that running the tool will be preferable to downloading the database for most users. Advantages of running the tool include allowing predictions for indels and branchpoints, as well as the flexibility of user selection and customisation of GTF annotations.
+
+Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
+
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
 
