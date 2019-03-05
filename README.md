@@ -36,7 +36,7 @@ The current Bioconductor release of Branchpointer supports SNV predictions. To i
 > source("https://bioconductor.org/biocLite.R")
 > biocLite("branchpointer")
 ```
-The current development version of Branchpointer also supports indels. To install this version instead:
+The development version of Branchpointer also supports indels. To install this version instead:
 ```
 > library(devtools)
 > install_github("betsig/branchpointer_dev")
@@ -56,20 +56,20 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 > cd path/to/Spliceogen
 > ./RUN.sh -inputVCF path/to/singleOrMultipleFiles.vcf -fasta path/to/hgXX.fa -gtf path/to/annotation.gtf
 ```
-Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output format. Run this small example using the following command:
+Small VCF, BED, GTF and FASTA files are provided to demonstrate input and output formats. Run this small example using the following command:
 
 ```
 > ./RUN.sh -inputVCF toy/toy.vcf -gtf toy/toy.gtf -fasta toy/toy.fa
 ```
 
 ### BED input:
-For BED inputs, replace the -inputVCF flag with -inputBED. See toy.bed for an example input format.
+For BED inputs, replace the -inputVCF flag with -inputBED.
 
 ### Including Branchpointer:
 To include Branchpointer predictions, include the branchpointer flag and specify the genome build:
 
 ```
-> -branchpointer hgXX
+*basic usage command plus* -branchpointer hgXX
 ```
 Or for branchpointer_dev which handles both SNPs and indels, use the flag -branchpointerIndels hgXX
 
