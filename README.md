@@ -69,7 +69,7 @@ For BED inputs, replace the -inputVCF flag with -inputBED.
 To include Branchpointer predictions, include the branchpointer flag and specify the genome build:
 
 ```
-*basic usage command plus* -branchpointer hgXX
+*basic usage command* -branchpointer hgXX
 ```
 Or for branchpointer_dev which handles both SNPs and indels, use the flag -branchpointerIndels hgXX
 
