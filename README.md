@@ -14,18 +14,20 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 -Any whole genome FASTA (.fa)
 
 -Any GTF genome annotation (.gtf)
+
 ### Downloading required files:
 Browse and download FASTA/GTF versions from [Gencode](https://www.gencodegenes.org/human/)
 
-Alternatively, some recent (as of 2018) hg38 releases can be retrieved using:
+Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 ```
-> wget ftp://ftp.ensembl.org/pub/release-94/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.alt.fa.gz
+> wget ftp://ftp.ensembl.org/pub/release-95/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.alt.fa.gz
 > gunzip Homo_sapiens.GRCh38.dna.alt.fa.gz
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
 ### Dependencies:
 -Bedtools
+-Java
 
 ### Branchpointer dependencies:
 To include (optional) Branchpointer predictions, users require R, as well as Branchpointer and BSgenome packages installed.
@@ -47,6 +49,18 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 > if (!requireNamespace("BiocManager", quietly = TRUE))
 >     install.packages("BiocManager")
 > BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", version = "3.8")
+```
+
+### Docker:
+Alternatively, a docker image is provided with all dependencies installed. With docker installed, the basic command is:
+
+```
+> docker run -it mictro/spliceogen:testing /bin/bash
+```
+Or to run it with access to a local directory (containing your VCF/BED/GTF/FASTA files), use the command below. Replace $(pwd) with the path of your directory. The name of the destination directory (/my_dir) can be changed to anything.
+
+```
+> docker run -it -v $(pwd):/my_dir mictro/spliceogen:testing /bin/bash
 ```
 
 ## Running Spliceogen
@@ -120,6 +134,10 @@ ESS = Silencer (ESRseq)
 ESE = Enhancer (ESRseq)
 
 withinSS = within splice site
+
+donCreateP = donor creation logistic regression P value
+
+accCreateP = acceptor creation logistic regression P value
 
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
