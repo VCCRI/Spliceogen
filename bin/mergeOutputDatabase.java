@@ -4,17 +4,19 @@ import java.util.Arrays;
 import java.util.jar.Attributes.Name;
 import java.lang.*;
 import java.text.DecimalFormat;
-public class mergeOutput {
+public class mergeOutputDatabase {
 
 	//store output lines in buffers to minimise I/O
     public static String[] avBuffer = new String[30000];
     public static String[] donBuffer = new String[30000];
     public static String[] accBuffer = new String[30000];
     public static String[] ssBuffer = new String[30000];
+    public static String[] focusBuffer = new String[30000];
     public static int avBufferIndex = 0;
     public static int donBufferIndex = 0;
     public static int accBufferIndex = 0;
     public static int ssBufferIndex = 0;
+    public static int focusBufferIndex = 0;
 
     public static void main (String[] args) {
         if (args.length < 1) {
@@ -30,17 +32,18 @@ public class mergeOutput {
         int[] accEnd = new int[10000];
         String[] donNames = new String[10000];
         String[] accNames = new String[10000];
-        //Note array elements:
-        //scores[]...mesDonRef(0);mesDonAlt(1);mesAccRef(2);mesAccAlt(3);gsDonRef(4);gsDonAlt(5);gsAccRef(6);gsAccAlt(7);ESEmaxRef(8);ESEmaxAlt(9);ESSminRef(10);ESSminAlt(11);
-        //geneID[]...chr(0), name(1), end(2)
-        //prevID[]...chr(0), start(1), ref(2), alt(3), type(4)
         double[] scores = new double[12];
         Arrays.fill(scores, -99.0);
-        String[] geneID = { "", ".", ""};
-        String[] prevID = { "", "-99", "", "", "GENE"};
+        //Note "scores" array order:
+        //mesDonRef(0);mesDonAlt(1);mesAccRef(2);mesAccAlt(3);gsDonRef(4);gsDonAlt(5);gsAccRef(6);gsAccAlt(7);ESEmaxRef(8);ESEmaxAlt(9);ESSminRef(10);ESSminAlt(11);
         String s = "";
+        String[] geneID = { "", ".", ""}; //(0)chr, (1)name, (2)end
+        String[] prevID = { "", "-99", "", "", "GENE"}; //(0)chr, (1)start, (2)ref, (3)alt, (4)type         
         //process lines
         try {
+            //File file = new File("/home/steven/teeTest.txt");         
+            //BufferedReader br = new BufferedReader(new FileReader(file));
+            //while ((s = br.readLine()) != null) {
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             while ((s = in.readLine()) != null && s.length() != 0) {
             String[] split = s.split("\\s+");
@@ -138,7 +141,7 @@ public class mergeOutput {
         //GENE
         if (type.equals("GENE")) {
             //overlapping gene annotations
-        	if (ifGenesOverlap(geneID, chr, start)) {
+        	if (checkForOverlappingGenes(geneID, chr, start)) {
                 geneID[1] = geneID[1].concat(";").concat(split[3]);
                 geneID[2] = geneID[2].concat(";").concat(split[2]);
                 geneID[0] = split[0];
@@ -267,70 +270,48 @@ public class mergeOutput {
     }
 
 public static void appendToFiles (String fileName) {
-    String annovar_file = "output/"+fileName+"_out.txt";
-    String acc_fileUnsorted = "temp/"+fileName+"_acceptorCreating_unsorted.txt";
-    String don_fileUnsorted = "temp/"+fileName+"_donorCreating_unsorted.txt";
-    String ss_fileUnsorted = "temp/"+fileName+"_withinSS_unsorted.txt";
+    String annovarName = "output/"+fileName+"_out.txt";
+    String accName = "temp/"+fileName+"_acceptorCreating_unsorted.txt";
+    String donName = "temp/"+fileName+"_donorCreating_unsorted.txt";
+    String withinSSname = "temp/"+fileName+"_withinSS_unsorted.txt";
+    String focussedName = "output/"+fileName+"_focussed.txt";
     try {
         //write to _out
-        FileWriter fwAV = new FileWriter(annovar_file, true);
+        FileWriter fwAV = new FileWriter(annovarName, true);
         BufferedWriter avWriter = new BufferedWriter(fwAV);
         for (int i=0; i<avBufferIndex; i++) {
             avWriter.write(avBuffer[i]+"\n");
         }
         avWriter.close();
-        //write to _donorCreating
-        FileWriter fwDon = new FileWriter(don_fileUnsorted, true);
-        BufferedWriter donWriter = new BufferedWriter(fwDon);
-        for (int i=0; i<donBufferIndex; i++) {
-            donWriter.write(donBuffer[i]+"\n");
+        //write to _focussed
+        FileWriter fwFC = new FileWriter(focussedName, true);
+        BufferedWriter fcWriter = new BufferedWriter(fwFC);
+        for (int i=0; i<focusBufferIndex; i++) {
+            fcWriter.write(focusBuffer[i]+"\n");
         }
-        donWriter.close();
-        //write to _acceptorCreating
-        FileWriter fwAcc = new FileWriter(acc_fileUnsorted, true);
-        BufferedWriter accWriter = new BufferedWriter(fwAcc);
-        for (int i=0; i<accBufferIndex; i++) {
-            accWriter.write(accBuffer[i]+"\n");
-        }
-        accWriter.close();
-        //write to _withinSS
-        FileWriter fwSS = new FileWriter(ss_fileUnsorted, true);
-        BufferedWriter ssWriter = new BufferedWriter(fwSS);
-        for (int i=0; i<ssBufferIndex; i++) {
-            ssWriter.write(ssBuffer[i]+"\n");
-        }
-        ssWriter.close();
+        fcWriter.close();
     } catch (IOException e) {
         System.out.println(e.getMessage());
     }
 }
 
 public static void writeHeaders (String fileName) {
-    String annovar_file = "output/"+fileName+"_out.txt";
-    String acc_file = "output/"+fileName+"_acceptorCreating.txt";
-    String don_file = "output/"+fileName+"_donorCreating.txt";
-    String ss_file = "output/"+fileName+"_withinSS.txt";
+    String annovarName = "output/"+fileName+"_out.txt";
+    String accName = "temp/"+fileName+"_acceptorCreating_unsorted.txt";
+    String donName = "temp/"+fileName+"_donorCreating_unsorted.txt";
+    String withinSSname = "temp/"+fileName+"_withinSS_unsorted.txt";
+    String focussedName = "output/"+fileName+"_focussed.txt";
     try {
         //write to _out
-        FileWriter fwAV = new FileWriter(annovar_file);
+        FileWriter fwAV = new FileWriter(annovarName);
         BufferedWriter avWriter = new BufferedWriter(fwAV);
         avWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt\tdonCreateP\taccCreateP"+"\n");
         avWriter.close();
-        //write to _donorCreating
-        FileWriter fwDon = new FileWriter(don_file);
-        BufferedWriter donWriter = new BufferedWriter(fwDon);
-        donWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\tmesDonRef\tmesDonAlt\tgsDonRef\tgsDonAlt\tdonCreateP\n");
-        donWriter.close();
-        //write to _acceptorCreating
-        FileWriter fwAcc = new FileWriter(acc_file);
-        BufferedWriter accWriter = new BufferedWriter(fwAcc);
-        accWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesAccRef\tmesAccAlt\tgsAccRef\tgsAccAlt\taccCreateP\n");
-        accWriter.close();
-        //write to _withinSS
-        FileWriter fwSS = new FileWriter(ss_file);
-        BufferedWriter ssWriter = new BufferedWriter(fwSS);
-        ssWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\n");
-        ssWriter.close();
+        //write to _focussed
+        FileWriter fwFC = new FileWriter(focussedName);
+        BufferedWriter fcWriter = new BufferedWriter(fwFC);
+        fcWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tdonCreateP\taccCreateP\n");
+        fcWriter.close();
     } catch (IOException e) {
         System.out.println(e.getMessage());
     }
@@ -341,13 +322,17 @@ public static void resetOutputArrays() {
     donBuffer = new String[30000];
     accBuffer = new String[30000];
     ssBuffer = new String[30000];
-    avBufferIndex = 0; donBufferIndex = 0; accBufferIndex = 0; ssBufferIndex = 0;
+    focusBuffer = new String[30000];
+    avBufferIndex = 0; donBufferIndex = 0; accBufferIndex = 0; ssBufferIndex = 0; focusBufferIndex = 0;
     System.gc();
 }
 
+//String[] geneID = { "", ".", ""}; //(0)chr, (1)name, (2)end
+//String[] prevID = { "", "-99", "", "", "GENE"}; //(0)chr, (1)start, (2)ref, (3)alt, (4)type 
+
 public static String[] updateOverlappingGenes(String[] geneID, String[] prevID) {
     //check if previous variant falls within an annotated splice site motif
-	//if previous genes overlapped, check individually whether they overlap this variant and update
+	//if previous genes overlapped, check individually whether they overlap this variant
     if (geneID[1].contains(";")) {
         String[] geneNameSplit = geneID[1].split(";");
         String[] geneEndSplit = geneID[2].split(";");
@@ -423,52 +408,43 @@ public static String[] updateOverlappingGenes(String[] geneID, String[] prevID) 
     //write withinSS
     if (out[6].contains("ENSE")) {
         String ssLine = "";
-        for (int i=0; i<16; i++) {
+        for (int i=0; i<15; i++) {
             ssLine = ssLine+out[i]+"\t";
         }
-        double maxScoreDecrease = -99;
-        //if donorSS
-        if (out[6].contains("_donor")) {
-            if (!out[7].equals(".") && !out[8].equals(".")) {
-                maxScoreDecrease = Double.parseDouble(out[7]) - Double.parseDouble(out[8]); 
-            }
-        }
-        //if acceptorSS
-        if (out[6].contains("_acceptor")) {
-            if (!out[9].equals(".") && !out[10].equals(".")) {
-                if (maxScoreDecrease < Double.parseDouble(out[9]) - Double.parseDouble(out[10]) ) {
-                    maxScoreDecrease = Double.parseDouble(out[9]) - Double.parseDouble(out[10]); 
-                }
-            }
-        }
-        ssLine = ssLine+maxScoreDecrease;
+        ssLine = ssLine+out[19]+"\t"+out[20];
         ssBuffer[ssBufferIndex] = ssLine;
         ssBufferIndex++;
+        focusBuffer[focusBufferIndex] = ssLine;
+        focusBufferIndex++;
     } else {
         //write donCreating
         if (Double.parseDouble(out[19])>=0.7) {
             String donLine = "";
-            for (int i=0; i<6; i++) {
+            for (int i=0; i<15; i++) {
                 donLine= donLine+out[i]+"\t";
             }
-            donLine = donLine+out[7]+"\t"+out[8]+"\t"+out[11]+"\t"+out[12]+"\t"+out[19];
+            donLine = donLine+out[19]+"\t"+out[20];
             donBuffer[donBufferIndex] = donLine;
             donBufferIndex++;
+            focusBuffer[focusBufferIndex] = donLine;
+            focusBufferIndex++;
         }
         //write accCreating
         if (Double.parseDouble(out[20])>=0.7) {
             String accLine = "";
-            for (int i=0; i<6; i++) {
+            for (int i=0; i<15; i++) {
                 accLine= accLine+out[i]+"\t";
             }
-            accLine = accLine+out[9]+"\t"+out[10]+"\t"+out[13]+"\t"+out[14]+"\t"+out[20];
+            accLine = accLine+out[19]+"\t"+out[20];
             accBuffer[accBufferIndex] = accLine;
             accBufferIndex++;
+            focusBuffer[focusBufferIndex] = accLine;
+            focusBufferIndex++;
         }
     }              
 }
 	
-	public static boolean ifGenesOverlap(String[] geneID, String chr, int start) {
+	public static boolean checkForOverlappingGenes(String[] geneID, String chr, int start) {
         //check for overlapping genes
         int overlapTest = 0;
         //check individually for already overlapping genes
@@ -502,5 +478,7 @@ public static String[] updateOverlappingGenes(String[] geneID, String[] prevID) 
         }
         return false;
 	}
+	}
 
-}
+
+

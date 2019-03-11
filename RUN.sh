@@ -143,8 +143,8 @@ for FILE in $INPUTFILES; do
     grep "^#" "$FILE" > temp/"$fileID"_sorted
     grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
     #check bedtools is installed
-    bedtoolsLocation=$(command -v docker);
-    if [ "$bedtoolsLocation" != "" ]; then
+    bedtoolsLocation=$(which bedtools);
+    if [ "$bedtoolsLocation" == "" ]; then
         printf -- 'Warning: Bedtools does not appear to be installed.\n';
         printf -- 'Get it here: https://bedtools.readthedocs.io/en/latest/content/installation.html\n';
     fi;
@@ -217,23 +217,23 @@ for FILE in $INPUTFILES; do
     #merge scores into one line
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt |
-    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
+    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | tee teeTest2.txt | java -cp bin mergeOutput "$fileID"
     #sort predictions
-    if [ -f temp/"$fileID"_donorCreating_unsorted.txt ]; then
+    if [ -s temp/"$fileID"_donorCreating_unsorted.txt ]; then
         sort -gr -k11,11 temp/"$fileID"_donorCreating_unsorted.txt >> output/"$fileID"_donorCreating.txt
     else
         rm output/"$fileID"_donorCreating.txt
     fi 
-    if [ -f temp/"$fileID"_acceptorCreating_unsorted.txt ]; then
+    if [ -s temp/"$fileID"_acceptorCreating_unsorted.txt ]; then
         sort -gr -k11,11 temp/"$fileID"_acceptorCreating_unsorted.txt >> output/"$fileID"_acceptorCreating.txt
     else
         rm output/"$fileID"_acceptorCreating.txt
     fi 
-    if [ -f temp/"$fileID"_withinSS_unsorted.txt ]; then
+    if [ -s temp/"$fileID"_withinSS_unsorted.txt ]; then
         sort -gr -k17,17 temp/"$fileID"_withinSS_unsorted.txt | cut -f1-15 >> output/"$fileID"_withinSS.txt
     else
         rm output/"$fileID"_withinSS.txt
     fi 
     #clean up temp files
-    #rm temp/"$fileID"* 2> /dev/null
+    rm temp/"$fileID"* 2> /dev/null
 done
