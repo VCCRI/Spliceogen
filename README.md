@@ -55,12 +55,12 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 Alternatively, a docker image is provided with all dependencies installed. With docker installed, the basic command is:
 
 ```
-> docker run -it mictro/spliceogen:testing /bin/bash
+> docker run -it mictro/spliceogen:latest /bin/bash
 ```
 Or to run it with access to a local directory (containing your VCF/BED/GTF/FASTA files), use the command below. Replace $(pwd) with the path of your directory. The name of the destination directory (/my_dir) can be changed to anything.
 
 ```
-> docker run -it -v $(pwd):/my_dir mictro/spliceogen:testing /bin/bash
+> docker run -it -v $(pwd):/my_dir mictro/spliceogen:latest /bin/bash
 ```
 
 ## Running Spliceogen
