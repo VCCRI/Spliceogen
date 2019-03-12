@@ -25,7 +25,7 @@ Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 > wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_29/gencode.v29.basic.annotation.gtf.gz
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
-### Dependencies:
+### Spliceogen Dependencies:
 -Bedtools
 
 -Java
