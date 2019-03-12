@@ -63,7 +63,10 @@ Or to run it with access to a local directory (containing your VCF/BED/GTF/FASTA
 ```
 > docker run -it -v $(pwd):/my_dir mictro/spliceogen:latest /bin/bash
 ```
-
+Then move to the Spliceogen directory:
+```
+> cd app/Spliceogen
+```
 ## Running Spliceogen
 
 ### Basic Usage:
