@@ -27,6 +27,7 @@ Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 ```
 ### Dependencies:
 -Bedtools
+
 -Java
 
 ### Branchpointer dependencies:
