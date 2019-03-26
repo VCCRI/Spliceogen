@@ -324,7 +324,7 @@ public static void writeHeaders (String fileName) {
         //write to _acceptorCreating
         FileWriter fwAcc = new FileWriter(acc_file);
         BufferedWriter accWriter = new BufferedWriter(fwAcc);
-        accWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesAccRef\tmesAccAlt\tgsAccRef\tgsAccAlt\taccCreateP\n");
+        accWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\tmesAccRef\tmesAccAlt\tgsAccRef\tgsAccAlt\taccCreateP\n");
         accWriter.close();
         //write to _withinSS
         FileWriter fwSS = new FileWriter(ss_file);

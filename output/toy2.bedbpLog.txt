@@ -1,0 +1,7 @@
+4 query ids are not unique
+Check output for new names or rename
+filtering for SNPs in branchpoint windows
+specified cores (8) is greater than available cores(4)
+using all available cores
+
+Execution halted
