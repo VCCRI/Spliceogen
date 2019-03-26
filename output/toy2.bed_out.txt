@@ -1,1 +1,0 @@
-#CHR	START	END	REF	ALT	GENE	withinSite	mesDonRef	mesDonAlt	mesAccRef	mesAccAlt	gsDonRef	gsDonAlt	gsAccRef	gsAccAlt	ESEmaxRef	ESEmaxAlt	ESSminRef	ESSminAlt	donCreateP	accCreateP
