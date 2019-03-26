@@ -26,12 +26,18 @@ Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
 ### Spliceogen Dependencies:
--Bedtools
+-Bedtools (tested on v2.26.0)
 
 -Java
 
 ### Branchpointer dependencies:
-To include (optional) Branchpointer predictions, users require R, as well as Branchpointer and BSgenome packages installed.
+To include (optional) Branchpointer predictions, users require:
+
+-R (tested on v3.4.3)
+
+-Branchpointer
+
+-a BSgenome
 
 The current Bioconductor release of Branchpointer supports SNV predictions. To install it from an R prompt:
 
