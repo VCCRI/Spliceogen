@@ -1,10 +1,10 @@
 # Spliceogen
-Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNVs and indels. [Databases](#Database) of genome-wide predictions are also available.
+Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNVs and indels. [Databases](##Database) of genome-wide predictions are also available.
 
 Author and maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
-Instructions for installation and obtaining required files. Ensure dependencies are met, or alternatively, follow our instructions for running Spliceogen from a docker image.
+Instructions for installation and obtaining required files. Ensure (dependencies)[###Dependencies] are met, or alternatively, run Spliceogen from the provided (docker)[###Docker] image.
 ### Installation:
 Navigate to your desired installation directory and clone this repository:
 ```
@@ -58,7 +58,7 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 ```
 
 ### Docker:
-Alternatively, a docker image is provided with all dependencies installed. With docker installed, the basic command is:
+A docker image is provided with all Spliceogen and Branchpointer dependencies installed. With docker installed, the basic command is:
 
 ```
 > docker run -it mictro/spliceogen:latest /bin/bash
@@ -162,7 +162,7 @@ The “focussed” version contains all donor and acceptor predictions:
 
 hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19_focussed.zip
 
-hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38._focussed.zip
+hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38_focussed.zip
 
 The comprehensive version contains all donor, acceptor, silencer and enhancer predictions:
 
