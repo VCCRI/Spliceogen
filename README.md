@@ -156,7 +156,7 @@ Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 millio
 
 ## Database
 
-We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, assessing every SNV at every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38.
+We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, assessing every SNV at every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38. The databases are formatted for ANNOVAR, and we also provide index files to speed up annotation.
 
 The “focussed” version contains all donor and acceptor predictions: 
 
