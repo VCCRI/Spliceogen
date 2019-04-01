@@ -4,7 +4,7 @@ Spliceogen is an integrative, scalable tool for the discovery of splice-altering
 Author and maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
-See here for installation instructions and required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided (docker)[###docker] image.
+See here for installation instructions and required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided (docker)[#docker] image.
 ### Installation:
 Navigate to your desired installation directory and clone this repository:
 ```
