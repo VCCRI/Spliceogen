@@ -1,5 +1,5 @@
 # Spliceogen
-Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNVs and indels.
+Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNVs and indels. Databases of genome-wide predictions are also available.
 
 Author and maintainer: Steve Monger - s.monger@victorchang.edu.au
 
@@ -151,18 +151,27 @@ accCreateP = acceptor creation logistic regression P value
 
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
-## Database
-Genome-wide SNV databases are available for [download](https://github.com/VCCRI/Spliceogen/tree/master/database). These cover all possible SNVs at every genomic position within all protein-coding multi-exon transcripts (based on Gencode v29). Both hg19 and hg38 are available.
-
-An extensive version of the database containing MaxEntScan, GeneSplicer and ESRseq prediction scores for every possible SNV is available.
-
-Alternatively, for users only interested in identifying variants which disrupt or create donor/acceptor motifs (and not silencer/enhancer predictions), a leaner version of the database is provided. This version includes donor/acceptor predictions for all SNVs within splice sites, as well as all SNVs outside of splice sites that are likely to create donor/acceptor motifs. The database size is vastly reduced by excluding the large majority of SNVs which do not overlap splice sites and are not predicted to create a donor/acceptor motif.
-
 ## Scalability
 
 Spliceogen is highly scalable, so we recommend that running the tool will be preferable to downloading the database for most users. Advantages of running the tool include allowing predictions for indels and branchpoints, as well as the flexibility of user selection and customisation of GTF annotations.
 
 Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
+
+## Database
+
+We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, with predictions provided for every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38.
+
+The comprehensive version contains all scores, including for silencers and enhancers:
+hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19.zip
+hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38.zip
+
+The “focussed” version contains all donor/acceptor predictions (no silencer/enhancer scores): 
+hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19_focussed.zip
+hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38._focussed.zip
+
+Due to the sheer number of scores and predictions generated, we expect that the comprehensive database may be unwieldy for many use cases. In general we recommend running the tool to obtain comprehensive predictions, which has the advantage of including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
+
+The focussed database is much smaller, without reducing the sensitivity of donor/acceptor predictions, since it excludes the vast majority of SNVs which fall outside of splice sites and are unlikely to create a donor/acceptor motif (logistic regression prediction score <0.7). All SNVs within annotated splice sites and all SNVs likely to create a de novo donor or acceptor motif are represented in this database.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
