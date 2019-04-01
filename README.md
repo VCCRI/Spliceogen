@@ -97,6 +97,10 @@ To include Branchpointer predictions, include the branchpointer flag and specify
 ```
 Or for branchpointer_dev which handles both SNPs and indels, use the flag -branchpointerIndels hgXX
 
+## Scalability
+
+Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
+
 ## Output
 
 ### Files
@@ -151,22 +155,20 @@ accCreateP = acceptor creation logistic regression P value
 
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
-## Scalability
-
-Spliceogen is highly scalable, so we recommend that running the tool will be preferable to downloading the database for most users. Advantages of running the tool include allowing predictions for indels and branchpoints, as well as the flexibility of user selection and customisation of GTF annotations.
-
-Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
-
 ## Database
 
 We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, with predictions provided for every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38.
 
 The comprehensive version contains all scores, including for silencers and enhancers:
+
 hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19.zip
+
 hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38.zip
 
 The “focussed” version contains all donor/acceptor predictions (no silencer/enhancer scores): 
+
 hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19_focussed.zip
+
 hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38._focussed.zip
 
 Due to the sheer number of scores and predictions generated, we expect that the comprehensive database may be unwieldy for many use cases. In general we recommend running the tool to obtain comprehensive predictions, which has the advantage of including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
