@@ -4,7 +4,7 @@ Spliceogen is an integrative, scalable tool for the discovery of splice-altering
 Author and maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
-See here for installation instructions and required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided docker image.
+See here for installation instructions and obtaining required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided docker image.
 ### Installation:
 Navigate to your desired installation directory and clone this repository:
 ```
@@ -172,7 +172,7 @@ hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38.zip
 
 The focussed database contains predictions for all SNVs within annotated splice sites and all SNVs that are likely to create a de novo donor or acceptor motif. By excluding the vast majority of SNVs which fall outside of splice sites and are unlikely to create a donor/acceptor motif (logistic regression prediction score <0.7), this database is massively reduced in size without reducing the sensitivity of its donor/acceptor predictions.
 
-Due to the sheer number of scores and predictions provided, we expect that the comprehensive database may be unwieldy for many use cases. In general we recommend running the tool to obtain comprehensive predictions, which has the advantage of including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
+Due to the sheer number of scores and predictions provided, we expect that the comprehensive database may be unwieldy for many use cases. To obtain comprehensive predictions, we generally recommend running the tool instead. Other advantages of running the tool include including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
