@@ -37,7 +37,7 @@ To include (optional) Branchpointer predictions, users require:
 
 -Branchpointer
 
--a BSgenome
+-BSgenome
 
 The current Bioconductor release of Branchpointer supports SNV predictions. To install it from an R prompt:
 
@@ -50,12 +50,11 @@ The development version of Branchpointer also supports indels. To install this v
 > library(devtools)
 > install_github("betsig/branchpointer_dev")
 ```
-From an R prompt, install the hg38 BSgenomes package using the below command. For hg19, edit the 3rd line to "hg19".
+From an R prompt, install the hg38 BSgenomes package using the below command. For hg19, edit the 2nd line to "hg19".
 
 ```
-> if (!requireNamespace("BiocManager", quietly = TRUE))
->     install.packages("BiocManager")
-> BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", version = "3.8")
+> source("https://bioconductor.org/biocLite.R")
+> biocLite("BSgenome.Hsapiens.UCSC.hg38")
 ```
 
 ### Docker:
@@ -96,10 +95,6 @@ To include Branchpointer predictions, include the branchpointer flag and specify
 *basic usage command* -branchpointer hgXX
 ```
 Or for branchpointer_dev which handles both SNPs and indels, use the flag -branchpointerIndels hgXX
-
-## Scalability
-
-Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
 
 ## Output
 
@@ -155,9 +150,13 @@ accCreateP = acceptor creation logistic regression P value
 
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
+## Scalability
+
+Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
+
 ## Database
 
-We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, with predictions provided for every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38.
+We provide two versions of the Spliceogen database. Both databases have genome-wide coverage, assessing every SNV at every position within every annotated multi-exon protein-coding transcript (1.29 billion base pairs in total, or 4.9 billion SNVs). They are available for both hg19 and hg38.
 
 The comprehensive version contains all scores, including for silencers and enhancers:
 
@@ -171,9 +170,10 @@ hg19- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg19_focussed.zip
 
 hg38- https://s3-us-west-2.amazonaws.com/spliceogen/databases/hg38._focussed.zip
 
-Due to the sheer number of scores and predictions generated, we expect that the comprehensive database may be unwieldy for many use cases. In general we recommend running the tool to obtain comprehensive predictions, which has the advantage of including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
 
-The focussed database is much smaller, without reducing the sensitivity of donor/acceptor predictions, since it excludes the vast majority of SNVs which fall outside of splice sites and are unlikely to create a donor/acceptor motif (logistic regression prediction score <0.7). All SNVs within annotated splice sites and all SNVs likely to create a de novo donor or acceptor motif are represented in this database.
+The focussed database contains predictions for all SNVs within annotated splice sites and all SNVs that are likely to create a de novo donor or acceptor motif. By excluding the vast majority of SNVs which fall outside of splice sites and are unlikely to create a donor/acceptor motif (logistic regression prediction score <0.7), this database is massively reduced in size without reducing the sensitivity of its donor/acceptor predictions.
+
+Due to the sheer number of scores and predictions provided, we expect that the comprehensive database may be unwieldy for many use cases. In general we recommend running the tool to obtain comprehensive predictions, which has the advantage of including predictions for indels and (optionally) branchpoints, and the flexibility of selecting/customising your GTF annotation.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
