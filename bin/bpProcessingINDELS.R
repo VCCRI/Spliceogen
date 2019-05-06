@@ -25,43 +25,52 @@ if (identical(genomeBuild, "hg19")) {
 } else {
     print("Error: must specify genome build as hg38 or hg19")
 }
-
 exons <- gtfToExons(annotationFile)
 
-#format and filter for branchpoint window indels
-queryIndel <- readQueryFile(queryIndelFile, 
+#handle indels (if file not empty)
+if (file.exists(queryIndelFile)) {
+  #format and filter for branchpoint window indels
+  queryIndel <- readQueryFile(queryIndelFile, 
                           queryType = "indel", 
                           exons = exons)
 
-#predict branchpoints and specify number of cores
-branchpointPredictionsIndel <- predictBranchpoints(queryIndel,
+  #predict branchpoints and specify number of cores
+  branchpointPredictionsIndel <- predictBranchpoints(queryIndel,
                                                  queryType = "indel",
                                                  BSgenome = g,
                                                  useParallel = TRUE,
                                                  cores = 8)
 
-#summarise and define prediction thresholds
-#format and filter for branchpoint window SNPs
-print("1")
-querySNP <- readQueryFile(querySNPFile, 
+  #summarise and define prediction thresholds
+  queryIndelSummary <- predictionsToSummary(queryIndel,branchpointPredictionsIndel, probabilityCutoff = 0.52, probabilityChange = 0.15)
+  #write to file
+  fileDestinationIndels <- paste(outputPath, "bpOutputIndels.txt", sep='')
+  write.table(queryIndelSummary, fileDestinationIndels , quote = FALSE, sep="\t", row.names=FALSE)
+}
+#handle SNPs
+if (file.exists(querySNPFile)) {
+  #format and filter for branchpoint window SNPs
+  querySNP <- readQueryFile(querySNPFile, 
                           queryType = "SNP", 
                           exons = exons, 
                           filter = TRUE,
                           maxDist = 50)
 
-print("1")
-#predict branchpoints and specify number of cores
-branchpointPredictionsSNP <- predictBranchpoints(querySNP,
+  #predict branchpoints and specify number of cores
+  branchpointPredictionsSNP <- predictBranchpoints(querySNP,
                                                  queryType = "SNP",
                                                  BSgenome = g,
                                                  useParallel = TRUE,
                                                  cores = 8)
 
-#summarise and define prediction thresholds
-querySNPSummary <- predictionsToSummary(querySNP,branchpointPredictionsSNP, probabilityCutoff = 0.52, probabilityChange = 0.15)
-queryIndelSummary <- predictionsToSummary(queryIndel,branchpointPredictionsIndel, probabilityCutoff = 0.52, probabilityChange = 0.15)
+  #summarise and define prediction thresholds
+  querySNPSummary <- predictionsToSummary(querySNP,branchpointPredictionsSNP, probabilityCutoff = 0.52, probabilityChange = 0.15)
+  #write to file
+  fileDestinationSNPs <- paste(outputPath, "bpOutputSNPs.txt", sep='')
+  write.table(querySNPSummary, fileDestinationSNPs , quote = FALSE, sep="\t", row.names=FALSE)
+}
 
-#identify branchpoints created/removed by Indel
+#optional: filter only for branchpoints created/removed by Indel
 if (FALSE) {
   l <- length(queryIndelSummary)
 BPcreated_or_removed <- vector()
@@ -71,9 +80,3 @@ for (i in 1:l) {
   }
 }
 }
-
-#write to file
-fileDestinationSNPs <- paste(outputPath, "bpOutputSNPs.txt", sep='')
-fileDestinationIndels <- paste(outputPath, "bpOutputIndels.txt", sep='')
-write.table(querySNPSummary, fileDestinationSNPs , quote = FALSE, sep="\t", row.names=FALSE)
-write.table(queryIndelSummary, fileDestinationIndels , quote = FALSE, sep="\t", row.names=FALSE)

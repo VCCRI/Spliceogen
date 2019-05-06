@@ -141,16 +141,23 @@ for FILE in $INPUTFILES; do
     rm temp/"$fileID"* 2> /dev/null
     #sort body of input file
     grep "^#" "$FILE" > temp/"$fileID"_sorted
-    grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
+    grep -v "^#" "$FILE" | sort -k1,1 -V -k2,2n >> temp/"$fileID"_sorted
     #check bedtools is installed
     bedtoolsLocation=$(which bedtools);
     if [ "$bedtoolsLocation" == "" ]; then
         printf -- 'Warning: Bedtools does not appear to be installed.\n';
         printf -- 'Get it here: https://bedtools.readthedocs.io/en/latest/content/installation.html\n';
     fi;
+    #note: the bedtools getfasta "-name" behaviour is not backwards compatible. Between v2.26.0 and v2.27.0 the previous function  of "name" was given to "name+". So need to alter command for different versions
+    recentBedtools=false
+    bedtoolsVersion=$(bedtools -version)
+    versionSort=$(echo -e "bedtools v2.26.0\nbedtools v2.27.0\n$bedtoolsVersion" | sort -V | head -2 | tail -1)
+    if [ "$versionSort" == "bedtools v2.27.0" ]; then
+        recentBedtools=true
+    fi
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | grep -v '^GL000' | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
+    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -V -k4,4n | grep -v '^GL000' | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
     if [ $? -ne 0 ]; then
         echo "Warning. Bedtools intersect returned non-zero exit status. Intersection failed between provided variant VCF/BED file and provided GTF. See above error message for more details"
     fi
@@ -167,7 +174,11 @@ for FILE in $INPUTFILES; do
         grep '[[:blank:]]-[[:blank:]]' temp/"$fileID"unstrandedInput.txt | awk -v OFS="\\t" '{print ".", $1, $2, "-", $7, $8}' | ( [[ "$USEBP" ]] && tee -a temp/"$fileID"bpInput.txt || cat ) | java -cp bin getFastaIntervals >> temp/"$fileID"fastaIntervals.bed
     fi
     echo "Retrieving flanking FASTA sequence..."
-    bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA
+    if [ "$recentBedtools" == true ]; then
+        bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name+ -s > temp/"$fileID"seqToScan.FASTA
+    else
+        bedtools getfasta -fi $FASTAPATH -bed temp/"$fileID"fastaIntervals.bed -name -s > temp/"$fileID"seqToScan.FASTA
+    fi
     if [ ! -s temp/"$fileID"seqToScan.FASTA ]; then
         echo "Error: no variants were returned following bedtools getfasta command. \n Exiting..."
         exit 1
@@ -178,13 +189,13 @@ for FILE in $INPUTFILES; do
     java -cp bin seqScan temp/"$fileID"seqToScan.FASTA -useESR $fileID 1>&2
     #run maxEntScan and confirm non-zero exit, since invalid inputs cause it to exit early
     echo "Running MaxEntScan..."
-    perl score5.pl temp/"$fileID"mesDonorInput.txt | tee temp/"$fileID"mesDonorInputUnprocessed.txt | java -cp bin processScoresMES > temp/"$fileID"mesDonorScores.txt
+    perl score5.pl temp/"$fileID"mesDonorInput.txt | java -cp bin processScoresMES > temp/"$fileID"mesDonorScores.txt
     retVal=( ${PIPESTATUS[0]} )
     if [ $retVal -ne 0 ]; then
         echo "MaxEntScan returned non-zero exit status. It is likely not all variants were processed. Exiting..."
     exit $retVal
     fi
-    perl score3.pl temp/"$fileID"mesAcceptorInput.txt | tee temp/"$fileID"mesAcceptorInputUnprocessed.txt | java -cp bin processScoresMES > temp/"$fileID"mesAcceptorScores.txt
+    perl score3.pl temp/"$fileID"mesAcceptorInput.txt | java -cp bin processScoresMES > temp/"$fileID"mesAcceptorScores.txt
     retVal=( ${PIPESTATUS[0]} )
     if [ $retVal -ne 0 ]; then
         echo "MaxEntScan returned non-zero exit status. It is likely not all variants were processed. Exiting..."
@@ -217,7 +228,7 @@ for FILE in $INPUTFILES; do
     #merge scores into one line
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt |
-    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | tee teeTest2.txt | java -cp bin mergeOutput "$fileID"
+    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
     #sort predictions
     if [ -s temp/"$fileID"_donorCreating_unsorted.txt ]; then
         sort -gr -k11,11 temp/"$fileID"_donorCreating_unsorted.txt >> output/"$fileID"_donorCreating.txt
