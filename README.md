@@ -28,7 +28,7 @@ Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 > gunzip gencode.v29.basic.annotation.gtf.gz
 ```
 ### Spliceogen Dependencies:
--Bedtools (tested on v2.26.0)
+-Bedtools
 
 -Java
 
