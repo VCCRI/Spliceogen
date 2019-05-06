@@ -1,7 +1,8 @@
 # Spliceogen
 Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates predictions from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>. Spliceogen accepts standard VCF/BED inputs and handles both SNVs and indels. [Databases](#database) of genome-wide predictions are also available.
 
-Author and maintainer: Steve Monger - s.monger@victorchang.edu.au
+Paper: https://doi.org/10.1093/bioinformatics/btz263
+Maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
 See here for installation instructions and obtaining required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided docker image.
