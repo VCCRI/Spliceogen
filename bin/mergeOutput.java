@@ -259,10 +259,13 @@ public class mergeOutput {
         // calculate p = 1/(1+e^-(a + b1X1 + b2X2 + ... + bnXn))
         double pDon = 1/(1 + Math.exp(-(-0.9865 + (mesDonChange * 0.1129) + (gsDonChange * 0.01151) + (s[1] * 0.2076) + (s[5] * 0.4350) )));
         double pAcc = 1/(1 + Math.exp(-(-1.665 + (mesAccChange * 0.3323) + (gsAccChange * 0.05084) + (s[3] * 0.1877) + (s[7] * 0.1730) )));
-        DecimalFormat df = new DecimalFormat("0.00");
-        pDon = Double.valueOf(df.format(pDon));
-        pAcc = Double.valueOf(df.format(pAcc));
-        String ret = Double.toString(pDon) + "\t" + Double.toString(pAcc);
+        //DecimalFormat df = new DecimalFormat("0.00");
+        //pDon = Double.valueOf(df.format(pDon));
+        //pAcc = Double.valueOf(df.format(pAcc));
+        String pDonStr = String.format("%.02f",pDon);
+        String pAccStr = String.format("%.02f",pAcc);
+        //String ret = String.format("%.2f", Double.toString(pDon)) + "\t" + Double.toString(pAcc);
+        String ret = pDonStr + "\t" + pAccStr;
         return ret;
     }
 
