@@ -141,7 +141,7 @@ for FILE in $INPUTFILES; do
     rm temp/"$fileID"* 2> /dev/null
     #sort body of input file
     grep "^#" "$FILE" > temp/"$fileID"_sorted
-    grep -v "^#" "$FILE" | sort -k1,1 -V -k2,2n >> temp/"$fileID"_sorted
+    grep -v "^#" "$FILE" | sort -k1,1 -k2,2n >> temp/"$fileID"_sorted
     #check bedtools is installed
     bedtoolsLocation=$(which bedtools);
     if [ "$bedtoolsLocation" == "" ]; then
@@ -157,7 +157,7 @@ for FILE in $INPUTFILES; do
     fi
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -V -k4,4n | grep -v '^GL000' | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
+    grep '[[:blank:]]gene[[:blank:]]' "$ANNOTATION" | sort -k1,1 -k4,4n | grep -v '^GL000' | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
     if [ $? -ne 0 ]; then
         echo "Warning. Bedtools intersect returned non-zero exit status. Intersection failed between provided variant VCF/BED file and provided GTF. See above error message for more details"
     fi
@@ -228,7 +228,7 @@ for FILE in $INPUTFILES; do
     #merge scores into one line
     echo "Processing scores..."
     cat temp/"$fileID"mesDonorScores.txt temp/"$fileID"mesAcceptorScores.txt temp/"$fileID"gsScores.txt temp/"$fileID"ESRoutput.txt data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt |
-    sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
+    sort -k1,1 -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
     #sort predictions
     if [ -s temp/"$fileID"_donorCreating_unsorted.txt ]; then
         sort -gr -k11,11 temp/"$fileID"_donorCreating_unsorted.txt >> output/"$fileID"_donorCreating.txt
