@@ -297,5 +297,5 @@ for FILE in $INPUTFILES; do
         sort -gr -k9,9 temp/"$fileID"_loss_unsorted.txt | cut -f1-8 >> output/"$fileID"_withinSS.txt
     fi 
     #clean up temp files
-    #rm temp/"$fileID"* 2> /dev/null
+    rm temp/"$fileID"* 2> /dev/null
 done
