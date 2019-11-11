@@ -1,2 +1,0 @@
-#CHR	START	REF	ALT	GENE	withinSS	donGainP	accGainP
-1	65510	T	G	OR4F5	ENSE00003813641.1_acceptor	.	0.52
