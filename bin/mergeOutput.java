@@ -15,11 +15,13 @@ public class mergeOutput {
     public static int ssBufferIndex = 0;
 
     public static void main (String[] args) {
-        if (args.length < 1) {
-            System.out.println("Must provide input filename arg...exiting");
+        if (args.length < 3) {
+            System.out.println("Too few input args...exiting");
             System.exit(1);
         }
         String fileName=args[0];
+        String chrAdd=args[1];
+        String chrRemove=args[2];
         writeHeaders(fileName);
         //initialise score tracking variables
         int[] donStart = new int[10000];
@@ -87,7 +89,11 @@ public class mergeOutput {
                     out[20]= lrScores[1];
                     out[21]= lrScores[2];
                     out[22]= lrScores[3];
-
+                    if (chrAdd.equals("inputAdd=chr")) {
+                        out[0]="chr"+out[0];
+                    } else if (chrRemove.equals("inputRemove=chr")) {
+                        out[0]=out[0].substring(3);
+                    }
                     //add output line to file buffers
                     outputVariantToBuffers(out);
                     //reset scores
@@ -213,59 +219,6 @@ public class mergeOutput {
             e.printStackTrace();
         }
     }
-    /*
-       public static String calculateLogRegScores (double[] s) {
-//impute missing values
-//maxEntScan
-for (int i=0; i<4; i++) {
-if (s[i]==-99.0 | s[i]==0.0) {
-s[i] = -20.0;
-}
-}                    
-//gsDonRef
-if (s[4]==-99.0 | s[4]==0.0) {
-if (s[5]==-99.0 | s[5]==0.0) {
-s[4]=0.0;
-s[5]=0.0;
-} else {
-s[4]=-3.0;
-}
-} else
-//gsDonAlt
-if (s[7]==-99.0 | s[7]==0.0) {
-s[7]=-3.0;
-}
-//gsAccRef
-if (s[6]==-99.0 | s[6]==0.0) {
-if (s[7]==-99.0 | s[7]==0.0) {
-s[6]=0.0;
-s[7]=0.0;
-} else {
-s[6]=-3.0;
-}
-} else
-//gsAccAlt
-if (s[7]==-99.0 | s[7]==0.0) {
-s[7]=-3.0;
-}
-double mesDonChange = s[1] - s[0];
-double mesAccChange = s[3] - s[2];
-double gsDonChange = s[5] - s[4];
-double gsAccChange = s[7] - s[6];
-// calculate p = 1/(1+e^-(a + b1X1 + b2X2 + ... + bnXn))
-double pDon = 1/(1 + Math.exp(-(-0.9865 + (mesDonChange * 0.1129) + (gsDonChange * 0.01151) + (s[1] * 0.2076) + (s[5] * 0.4350) )));
-double pAcc = 1/(1 + Math.exp(-(-1.665 + (mesAccChange * 0.3323) + (gsAccChange * 0.05084) + (s[3] * 0.1877) + (s[7] * 0.1730) )));
-String pDonStr = Double.toString(pDon);
-String pAccStr = Double.toString(pAcc);
-//round scores to 2 decimal places
-try {
-pDonStr = String.format("%.02f",pDon);
-pAccStr = String.format("%.02f",pAcc);
-} catch (Exception e) {}
-String ret = pDonStr + "\t" + pAccStr;
-return ret;
-}
-     */
 
 public static String calculateLogRegScores (double[] s, String withinSS) {
     //impute missing values
@@ -389,11 +342,6 @@ public static void writeHeaders (String fileName) {
         BufferedWriter avWriter = new BufferedWriter(fwAV);
         avWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt\tdonGainP\taccGainP\tdonLossP\taccLossP"+"\n");
         avWriter.close();
-        //write to _withinSS
-        //FileWriter fwSS = new FileWriter(ss_file);
-        //BufferedWriter ssWriter = new BufferedWriter(fwSS);
-        //ssWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tdonLossP\tAccLossP\n");
-        //ssWriter.close();
     } catch (IOException e) {
         System.out.println(e.getMessage());
     }
@@ -520,8 +468,6 @@ public static void outputVariantToBuffers(String[] out) {
         }
     }              
 }
-//            avWriter.write("#CHR\tSTART\tEND\tREF\tALT\tGENE\twithinSite\tmesDonRef\tmesDonAlt\tmesAccRef\tmesAccAlt\tgsDonRef\tgsDonAlt\tgsAccRef\tgsAccAlt\tESEmaxRef\tESEmaxAlt\tESSminRef\tESSminAlt\tdonGainP\taccGainP\tdonLossP\taccLossP"+"\n");
-//       String ret = pDonGainStr + "\t" + pAccGainStr + "\t" + pDonLossStr + "\t" + pAccLossStr;
 
 public static boolean ifGenesOverlap(String[] geneID, String chr, int start) {
     //check for overlapping genes

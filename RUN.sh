@@ -101,7 +101,7 @@ elif [ ! -f "$ANNOTATION" ]; then
     echo "GTF annotation file not found: use -gtf path/to/gencodeXX.gtf\nExiting..."
     exit 1
 fi
-#check input gtf/fasta "chr" nomenclature
+#correct mismatches in "chr" nomenclature between gtf and fasta
 gtfChr=$(zcat -f "$ANNOTATION" | grep -v '^GL000' | tail -1 | awk '{print $1}' | grep chr)
 fastaChr=$(cat "$FASTAPATH" | head -1 | awk '{print $1}' | grep chr)
     gtfChrAdd=""
@@ -145,7 +145,7 @@ for FILE in $INPUTFILES; do
         FILETYPE="BED"
     fi
     echo "File type: $FILETYPE"
-    #correct mismatches in "chr" nomenclature among input files
+    #correct mismatches in "chr" nomenclature between variant input and provided gtf/fasta
     inputChr=$(zcat -f "$FILE" | tail -1 | awk '{print $1}' | grep chr)
     inputChrAdd=""
     inputChrRemove="UnmatchedString"
@@ -163,7 +163,6 @@ for FILE in $INPUTFILES; do
         if [ "$FILETYPE" == "TSV" ]; then
             zcat -f "$FILE" | grep -v "^#" | sort -k1,1 -k2,2n | sed "s/$inputChrRemove//" | awk -v OFS="\\t" -v var=$inputChrAdd '{print var$1, $2, $2, "x", "1", ".", $3, $4}' >> temp/"$fileID"_sorted
         else 
-            #zcat -f "$FILE" | grep -v "^#" | sort -k1,1 -k2,2n | sed "s/$inputChrRemove//" | sed "/^/$inputChrAdd/" >> temp/"$fileID"_sorted
             zcat -f "$FILE" | grep -v "^#" | sort -k1,1 -k2,2n | sed "s/$inputChrRemove//" | awk -v OFS="\\t" -v var=$inputChrAdd '{print var$0}' >> temp/"$fileID"_sorted
         fi
     #check bedtools is installed
@@ -280,12 +279,23 @@ for FILE in $INPUTFILES; do
     if [ -s temp/"$fileID"ESRoutput.txt ] ; then
         scoresToMerge="$scoresToMerge temp/"$fileID"ESRoutput.txt"
     fi
+    #edit splice site intervals file in event of changed input/fasta "chr" nomenclature
+    intervalsFileChr=$(cat data/"$gtfBasename"_SpliceSiteIntervals.txt | head -1 | awk '{print $1}' | grep chr)
+    if [ "$fastaChr" != "" ]; then
+        if [ "$intervalsFileChr" == "" ]; then
+            sed -i 's/^/chr/' data/"$gtfBasename"_SpliceSiteIntervals.txt
+        fi
+    elif [ "$fastaChr" == "" ]; then
+        if [ "$gtfChr" != "" ]; then
+            sed -i "s/^chr//" data/"$gtfBasename"_SpliceSiteIntervals.txt
+        fi
+    fi
     checkScoresExist=$(echo "$scoresToMerge" | grep "temp")
     if [ -z "$checkScoresExist" ]; then
         echo "No MaxEntScan/GeneSplicer/ESRseq scores to process"
     else
         echo "Processing scores..."
-        cat $(echo "$scoresToMerge") data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | sort -k1,1 -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID"
+        cat $(echo "$scoresToMerge") data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID" inputAdd="$inputChrRemove" inputRemove="$inputChrAdd"
     fi
     #sort predictions
     if [ -s temp/"$fileID"_gain_unsorted.txt ]; then

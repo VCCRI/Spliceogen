@@ -1,0 +1,4 @@
+#CHR	START	END	REF	ALT	GENE	withinSite	mesDonRef	mesDonAlt	mesAccRef	mesAccAlt	gsDonRef	gsDonAlt	gsAccRef	gsAccAlt	ESEmaxRef	ESEmaxAlt	ESSminRef	ESSminAlt	donGainP	accGainP	donLossP	accLossP
+chr1	65510	65510	T	G	OR4F5	ENSE00003813641.1_acceptor	.	.	9.11	7.79	.	.	4.633193	2.350955	.	.	-0.286	-0.355	.	.	.	0.52
+chr1	66808	66808	A	G	OR4F5	.	-20.91	-12.73	-0.02	6.07	.	.	.	3.537563	.	.	-0.599	-0.678	0.06	0.92	.	.
+chr1	69015	69015	C	T	OR4F5	.	.	.	.	.	.	.	.	.	0.445	0.446	-0.225	-0.214	0.01	0.00	.	.
