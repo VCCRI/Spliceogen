@@ -43,7 +43,7 @@ Example VCF, TSV, GTF and FASTA files are provided to demonstrate input and outp
 > ./RUN.sh -input toy/toy.vcf -gtf toy/toy.gtf -fasta toy/toy.fa
 ```
 
-To include optional Branchpointer predictions, see instructions [below](#Including%20Branchpointer:)
+To include optional Branchpointer predictions, see instructions [below](#Including%20Branchpointer%3A)
 
 ### Input formats:
 
@@ -86,9 +86,15 @@ Multiple output files are created for each VCF/TSV in the Spliceogen/output dire
 
 The following abbreviations are used in the output headers:
 
-mes = MaxEntScan
+donGainP = donor creation logistic regression probability value
 
-gs = GeneSplicer
+accGainP = acceptor creation logistic regression probability value
+
+donLossP = donor disruption logistic regression probability value
+
+accLossP = acceptor disruption logistic regression probability value
+
+withinSS = within splice site
 
 don = Donor
 
@@ -98,19 +104,13 @@ ref = Reference allele
 
 alt = Alternative allele
 
-ESS = Silencer (ESRseq)
+mes = MaxEntScan
 
-ESE = Enhancer (ESRseq)
+gs = GeneSplicer
 
-withinSS = within splice site
+ESS = exonic splicing silencer (ESRseq score)
 
-donGainP = donor creation logistic regression probability value
-
-accGainP = acceptor creation logistic regression probability value
-
-donLossP = donor disruption logistic regression probability value
-
-accLossP = acceptor disruption logistic regression probability value
+ESE = exonic splicing enhancer (ESRseq score)
 
 So for example, the column "gsDonRef" contains GeneSplicer scores representing donor motif strength for the reference sequence, whereas "mesDonAlt" consists of MaxEntScan scores representing acceptor motif strength for the alternative sequence.
 
