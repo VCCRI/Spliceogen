@@ -43,8 +43,6 @@ Example VCF, TSV, GTF and FASTA files are provided to demonstrate input and outp
 > ./RUN.sh -input toy/toy.vcf -gtf toy/toy.gtf -fasta toy/toy.fa
 ```
 
-To include optional Branchpointer predictions, see instructions [below](#Including%20Branchpointer%3A)
-
 ### Input formats:
 
 As an alternative to VCF, a custom tab-separated format is allowed (chr    start    ref    alt). Gzipped GTF/VCF/TSV files are accepted.
