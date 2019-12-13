@@ -6,7 +6,7 @@ Publication: https://doi.org/10.1093/bioinformatics/btz263
 Maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
-See here for installation instructions and obtaining required files.
+
 ### Installation:
 Navigate to your desired installation directory and clone this repository:
 ```
@@ -18,7 +18,7 @@ git clone https://github.com/VCCRI/Spliceogen.git Spliceogen
 -Any GTF genome annotation (.gtf)
 
 ### Obtaining required files:
-Browse and download FASTA/GTF versions from [Gencode](https://www.gencodegenes.org/human/)
+FASTA/GTF files can be downloaded from [Gencode](https://www.gencodegenes.org/human/)
 
 Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 ```
@@ -43,11 +43,11 @@ Example VCF, TSV, GTF and FASTA files are provided to demonstrate input and outp
 > ./RUN.sh -input toy/toy.vcf -gtf toy/toy.gtf -fasta toy/toy.fa
 ```
 
-To include (optional) Branchpointer predictions, see instructions [below](#Including Branchpointer)
+To include optional Branchpointer predictions, see instructions [below](#Including Branchpointer)
 
 ### Input formats:
 
-As an alternative to VCF, a custom tab-separated format is allowed (chr/<tab/>start/<tab/>ref/<tab/>alt). Gzipped GTF/VCF/TSV files are accepted.
+As an alternative to VCF, a custom tab-separated format is allowed (chr    start    ref    alt). Gzipped GTF/VCF/TSV files are accepted.
 
 ## Scalability
 
@@ -57,7 +57,10 @@ Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 millio
 
 ### Predictions
 
-We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  Note that these probability values are used for ranking, and should not be interpreted as the actual probabilty of splice alteration. Similarly, these scores should not be compared across different models (for instance, donor loss and donor gain).
+We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  
+
+
+Note that these probability values are used for ranking, and should not be interpreted as the actual probability of splice alteration. Similarly, these scores should not be compared across different models (for instance, donor loss and donor gain).
 
 ### Files
 
@@ -156,5 +159,3 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 4. Signal, B., et al., "Machine learning annotation of human branchpoints", Bioinformatics. 2018; 34(6):920-927
 
 5. Shiraishi, Y., et al., "A comprehensive characterization of cis-acting splicing-associated variants in human cancer", Genome Res. 2018; 28(8):1111-1125
-
-6. Wang, K., et al., "ANNOVAR: functional annotation of genetic variants from high-throughput sequencing data", Nucleic Acids Res. 2010; 38(16):e164
