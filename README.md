@@ -58,7 +58,7 @@ Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 millio
 We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  
 
 
-Note that these probability values are used for ranking, and should not be interpreted as the actual probability of splice alteration. Similarly, these scores should not be compared across different models (for instance, donor loss and donor gain).
+Note that these probability values are used for ranking, and should not be interpreted as the actual probability of splice alteration. Similarly, these scores should not be compared across different models.
 
 ### Files
 
