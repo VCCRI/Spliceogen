@@ -49,7 +49,7 @@ As an alternative to VCF, a custom tab-separated format is allowed (chr    start
 
 ## Scalability
 
-Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions. If preferred, a genome-wide database of pre-computed predictions for all SNVs within genes is available. Contact us to obtain this.
+Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated. If preferred, a genome-wide database of pre-computed predictions for all SNVs within genes is available. Contact us to obtain this.
 
 ## Output
 
