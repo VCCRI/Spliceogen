@@ -1,12 +1,12 @@
 # Spliceogen
-Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates scores from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>, and provides predictions based on logistic regression models trained on reported splice-altering variants<sup>5</sup>. Spliceogen accepts VCF/TSV inputs and handles both SNVs and indels. Databases of genome-wide predictions are also available.
+Spliceogen is an integrative, scalable tool for the discovery of splice-altering variants. Variants are assessed for their potential to create or disrupt any of the cis motifs which guide splice site definition: donors, acceptors, branchpoints, enhancers and silencers. Spliceogen integrates scores from MaxEntScan<sup>1</sup>, GeneSplicer<sup>2</sup>, ESRseq<sup>3</sup> and Branchpointer<sup>4</sup>, and provides predictions based on logistic regression models trained on reported splice-altering variants<sup>5</sup>. Spliceogen accepts VCF/TSV inputs and handles both SNVs and indels.
 
 Publication: https://doi.org/10.1093/bioinformatics/btz263
 
 Maintainer: Steve Monger - s.monger@victorchang.edu.au
 
 ## Getting Started
-See here for installation instructions and obtaining required files. Ensure dependencies are met, or alternatively, run Spliceogen from the provided docker image.
+See here for installation instructions and obtaining required files.
 ### Installation:
 Navigate to your desired installation directory and clone this repository:
 ```
@@ -30,21 +30,6 @@ Alternatively, some recent (as of 2019) hg38 releases can be retrieved using:
 
 -Java
 
-### Docker:
-A docker image is provided with all Spliceogen and Branchpointer dependencies installed. With docker installed, the basic command is:
-
-```
-> docker run -it mictro/spliceogen:latest /bin/bash
-```
-Or to run it with access to a local directory (containing your VCF/TSV/GTF/FASTA files), use the command below. Replace $(pwd) with the path of your directory. The name of the destination directory (/my_dir) can be changed to anything.
-
-```
-> docker run -it -v $(pwd):/my_dir mictro/spliceogen:latest /bin/bash
-```
-Then move to the Spliceogen directory:
-```
-> cd app/Spliceogen
-```
 ## Running Spliceogen
 
 ### Basic Usage:
@@ -62,9 +47,17 @@ To include (optional) Branchpointer predictions, see instructions [below](#Inclu
 
 ### Input formats:
 
-As an alternative to VCF, a custom tab-separated format is allowed (chr<tab>start<tab>ref<tab>alt). Gzipped GTF/VCF/TSV files are accepted.
+As an alternative to VCF, a custom tab-separated format is allowed (chr/<tab/>start/<tab/>ref/<tab/>alt). Gzipped GTF/VCF/TSV files are accepted.
+
+## Scalability
+
+Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions. If preferred, a genome-wide database of pre-computed predictions for all SNVs within genes is available. Contact us to obtain this.
 
 ## Output
+
+### Predictions
+
+We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  Note that these probability values are used for ranking, and should not be interpreted as the actual probabilty of splice alteration. Similarly, these scores should not be compared across different models (for instance, donor loss and donor gain).
 
 ### Files
 
@@ -72,15 +65,15 @@ Multiple output files are created for each VCF/TSV in the Spliceogen/output dire
 
 1) "$file"_out.txt:
 
-    Contains all scores generated for every variant, sorted in ascending chromosomal/start position order.
+    Contains all scores generated for every variant, sorted in standard ascending chromosomal/start order.
 
 2) "$file"_withinSS.txt:
 
-    Contains all variants that overlap annotated splice sites. The overlapping splice sites are denoted by their exonID and "\_donor" or "\_acceptor". Variants are ranked and sorted by their potential for splice site disruption (maximum of donLossP and accLossP).
+    Contains all variants that overlap annotated splice sites. The overlapping splice sites are denoted by their exonID and "\_donor" or "\_acceptor". Variants are sorted by the maximum of donLossP and accLossP, such that variants most likely to disrupt acceptor/donor splice sites appear at the top of this file.
 
 3) "$file"_ssGain.txt
 
-    Contains variants outside of existing splice sites that are predicted to create donor or acceptor motifs. Variants are ranked and sorted by their potential to create a donor/acceptor motif (maximum of donGainP and accGainP).
+    Contains variants outside of existing splice sites that are predicted to create donor or acceptor motifs. Variants are sorted by the maximum of donGainP and accGainP, such that variants most likely to create acceptor/donor splice sites appear at the top of this file.
 
 4) "$file"_bpOutput.txt
 
@@ -152,10 +145,6 @@ From an R prompt, install the hg38 BSgenomes package using the below command. Fo
 > source("https://bioconductor.org/biocLite.R")
 > biocLite("BSgenome.Hsapiens.UCSC.hg38")
 ```
-
-## Scalability
-
-Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated, without Branchpointer predictions.
 
 ## References:
 1. Yeo, G., Burge, C., "Maximum Entropy Modeling of Short Sequence Motifs with Applications to RNA Splicing Signals", J Comput Biol. 2004; 11(2-3):377-94
