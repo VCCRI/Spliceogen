@@ -49,16 +49,16 @@ As an alternative to VCF, a custom tab-separated format is allowed (chr    start
 
 ## Scalability
 
-Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated. If preferred, a genome-wide database of pre-computed predictions for all SNVs within genes is available. Contact us to obtain this.
+Spliceogen is highly scalable. Predictions are generated at a rate of 2.3 million variants/compute hour, with peak memory usage less than 500Mb. Benchmarking was performed using a single compute node with 1 CPU allocated. If preferred, a genome-wide database of pre-computed predictions for all SNVs within genes is available (contact us).
 
 ## Output
 
 ### Predictions
 
-We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  
+We developed logistic regression models for each of the following classes of splice-altering variants: donor loss, acceptor loss, donor gain and acceptor gain. Using these models, we derive probability values which are used to rank variants based on the likelihood that they will cause each kind of splice-altering variant. Variants outside of splice sites are assigned donor and acceptor gain scores only, while variants within donor/acceptor splice sites are assigned only donor/acceptor loss scores.  
 
 
-Note that these probability values are used for ranking, and should not be interpreted as the actual probability of splice alteration. Similarly, these scores should not be compared across different models.
+Note that these probability values are used for ranking only; they should not be interpreted as the actual probability of splice alteration. Similarly, the scores should not be compared between different classes (gain/loss etc).
 
 ### Files
 
