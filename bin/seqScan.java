@@ -196,15 +196,18 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                     //if acceptor
                     if (s.substring(i, i+2).equals("ag") && i!=17+flank-correct1) {
                         //output ref and alt acceptor strings
-                        mesOutputAcc[mesIndexAcc]=s.substring(i-18, i+5).concat(id).concat("ACC").concat("REF");
+//test
+                        int pos = flank-i-correct1+41; 
+                        mesOutputAcc[mesIndexAcc]=s.substring(i-18, i+5).concat(id).concat("ACC").concat("REF;").concat(Integer.toString(pos));
                         mesIndexAcc++;
-                        mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18, i+5).concat(id).concat("ACC").concat("ALT");
+                        mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18, i+5).concat(id).concat("ACC").concat("ALT;").concat(Integer.toString(pos));
                         mesIndexAcc++;
                         //for indels, output offset alt acceptor string
                         if (ref.length()>1 || correct2==1) {
                             int j=1;
                             do {                
-                                mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18-j, i+5-j).concat(id).concat("ACC").concat("ALT");
+                                mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18-j, i+5-j).concat(id).concat("ACC").concat("ALT;").concat(Integer.toString(pos+j));
+//test
                                 mesIndexAcc++;
                                 j++;
                             }
@@ -213,7 +216,8 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                             if (alt.length()>1) {
                                 int j=1;
                                 do {
-                                    mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18+j, i+5+j).concat(id).concat("ACC").concat("ALT");
+//test
+                                    mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18+j, i+5+j).concat(id).concat("ACC").concat("ALT;").concat(Integer.toString(pos+j));
                                     mesIndexAcc++;
                                     j++;
                                 }
@@ -223,15 +227,16 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                     //if donor
                     if (s.substring(i, i+2).equals("gt") && i<26+correct1+flank+ref.length()-1) {
                         //output ref and alt donor strings
-                        mesOutputDon[mesIndexDon]=s.substring(i-3, i+6).concat(id).concat("DON").concat("REF");
+                        int pos = flank-i-correct1+32; 
+                        mesOutputDon[mesIndexDon]=s.substring(i-3, i+6).concat(id).concat("DON").concat("REF;").concat(Integer.toString(pos));
                         mesIndexDon++;
-                        mesOutputDon[mesIndexDon]=altSeq.substring(i-3, i+6).concat(id).concat("DON").concat("ALT");
+                        mesOutputDon[mesIndexDon]=altSeq.substring(i-3, i+6).concat(id).concat("DON").concat("ALT;").concat(Integer.toString(pos));
                         mesIndexDon++;
                         //for indels, output offset alt donor string
                         if (ref.length()>1 || correct2==1) {
                             int j=1;
                             do {                
-                                mesOutputDon[mesIndexDon]=altSeq.substring(i-3-j, i+6-j).concat(id).concat("DON").concat("ALT");
+                                mesOutputDon[mesIndexDon]=altSeq.substring(i-3-j, i+6-j).concat(id).concat("DON").concat("ALT;").concat(Integer.toString(pos+j));
                                 mesIndexDon++;
                                 j++;
                             }
@@ -240,7 +245,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                             if (alt.length()>1) {
                                 int j=1;
                                 do {
-                                    mesOutputDon[mesIndexDon]=altSeq.substring(i-3+j, i+6+j).concat(id).concat("DON").concat("ALT");
+                                    mesOutputDon[mesIndexDon]=altSeq.substring(i-3+j, i+6+j).concat(id).concat("DON").concat("ALT;").concat(Integer.toString(pos+j));
                                     mesIndexDon++;
                                     j++;
                                 }
@@ -253,15 +258,18 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                     //if acceptor
                     if (altSeq.substring(i, i+2).equals("ag") && i!=17+flank) {
                         //output ref and alt acceptor strings
-                        mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18, i+5).concat(id).concat("ACC").concat("ALT");
+//test
+                        int pos = flank-i-correct1+41;
+                        mesOutputAcc[mesIndexAcc]=altSeq.substring(i-18, i+5).concat(id).concat("ACC").concat("ALT;").concat(Integer.toString(pos));
                         mesIndexAcc++;
-                        mesOutputAcc[mesIndexAcc]=s.substring(i-18, i+5).concat(id).concat("ACC").concat("REF");
+                        mesOutputAcc[mesIndexAcc]=s.substring(i-18, i+5).concat(id).concat("ACC").concat("REF;").concat(Integer.toString(pos));
                         mesIndexAcc++;
                         //for indels, output offset ref acceptor string
                         if (alt.length()>1) {
                             int j=1;
                             do {
-                                mesOutputAcc[mesIndexAcc]=s.substring(i-18-j, i+5-j).concat(id).concat("ACC").concat("REF");
+//test
+                                mesOutputAcc[mesIndexAcc]=s.substring(i-18-j, i+5-j).concat(id).concat("ACC").concat("REF;").concat(Integer.toString(pos+j));
                                 mesIndexAcc++;
                                 j++;
                             }
@@ -270,7 +278,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                         if (ref.length()>1||correct2==1) {
                             int j=1;
                             do {
-                                mesOutputAcc[mesIndexAcc]=s.substring(i-18+j, i+5+j).concat(id).concat("ACC").concat("REF");
+                                mesOutputAcc[mesIndexAcc]=s.substring(i-18+j, i+5+j).concat(id).concat("ACC").concat("REF;").concat(Integer.toString(pos+j));
                                 mesIndexAcc++;
                                 j++;
                             }
@@ -279,16 +287,17 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                     }
                     //if donor
                     if (altSeq.substring(i, i+2).equals("gt") && i<26+correct1+flank+alt.length()-1) {
+                        int pos = flank-i-correct1+32; 
                         //output ref and alt donor strings
-                        mesOutputDon[mesIndexDon]=altSeq.substring(i-3, i+6).concat(id).concat("DON").concat("ALT");
+                        mesOutputDon[mesIndexDon]=altSeq.substring(i-3, i+6).concat(id).concat("DON").concat("ALT;").concat(Integer.toString(pos));
                         mesIndexDon++;
-                        mesOutputDon[mesIndexDon]=s.substring(i-3, i+6).concat(id).concat("DON").concat("REF");
+                        mesOutputDon[mesIndexDon]=s.substring(i-3, i+6).concat(id).concat("DON").concat("REF;").concat(Integer.toString(pos));
                         mesIndexDon++;
                         //for indels, output offset ref donor string
                         if (alt.length()>1) {
                             int j=1;
                             do {
-                                mesOutputDon[mesIndexDon]=s.substring(i-3-j, i+6-j).concat(id).concat("DON").concat("REF");
+                                mesOutputDon[mesIndexDon]=s.substring(i-3-j, i+6-j).concat(id).concat("DON").concat("REF;").concat(Integer.toString(pos+j));
                                 mesIndexDon++;
                                 j++;
                             }
@@ -297,7 +306,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                         if (ref.length()>1 || correct2==1) {
                             int j=1;
                             do {
-                                mesOutputDon[mesIndexDon]=s.substring(i-3+j, i+6+j).concat(id).concat("DON").concat("REF");
+                                mesOutputDon[mesIndexDon]=s.substring(i-3+j, i+6+j).concat(id).concat("DON").concat("REF;").concat(Integer.toString(pos+j));
                                 mesIndexDon++;
                                 j++;                    
                             }
