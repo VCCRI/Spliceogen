@@ -144,7 +144,6 @@ for FILE in $INPUTFILES; do
     else
         FILETYPE="BED"
     fi
-    echo "File type: $FILETYPE"
     #correct mismatches in "chr" nomenclature between variant input and provided gtf/fasta
     inputChr=$(zcat -f "$FILE" | tail -1 | awk '{print $1}' | grep chr)
     inputChrAdd=""
@@ -180,7 +179,7 @@ for FILE in $INPUTFILES; do
     fi
     #bedtools intersect to get strand info
     echo "Retrieving strand info..."
-    zcat -f "$ANNOTATION" | grep '[[:blank:]]gene[[:blank:]]' | sort -k1,1 -k4,4n | grep -v '^GL000' | awk -v var="$gtfChrAdd" -v OFS="\\t" '{print var$0}' | sed "s/$gtfChrRemove//" | tee "$fileID"_gtfTemp.txt | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
+    zcat -f "$ANNOTATION" | grep '[[:blank:]]gene[[:blank:]]' | sort -k1,1 -k4,4n | grep -v '^GL000' | awk -v var="$gtfChrAdd" -v OFS="\\t" '{print var$0}' | sed "s/$gtfChrRemove//" | bedtools intersect -a temp/"$fileID"_sorted -b stdin -wa -wb -sorted  > temp/"$fileID"unstrandedInput.txt 
     if [ $? -ne 0 ]; then
         echo "Warning. Bedtools intersect returned non-zero exit status. Intersection failed between provided variant VCF/BED file and provided GTF. See above error message for more details"
     fi
@@ -295,7 +294,7 @@ for FILE in $INPUTFILES; do
         echo "No MaxEntScan/GeneSplicer/ESRseq scores to process"
     else
         echo "Processing scores..."
-        cat $(echo "$scoresToMerge") data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | tee "$fileID"_mergeInput.txt | java -cp bin mergeOutput "$fileID" inputAdd="$inputChrRemove" inputRemove="$inputChrAdd"
+        cat $(echo "$scoresToMerge") data/"$gtfBasename"_SpliceSiteIntervals.txt sources/terminatingMergeLine.txt | sort -k1,1 -V -k 2,2n -k 3 -k 4 -s | java -cp bin mergeOutput "$fileID" inputAdd="$inputChrRemove" inputRemove="$inputChrAdd"
     fi
     #sort predictions
     if [ -s temp/"$fileID"_gain_unsorted.txt ]; then
@@ -303,9 +302,9 @@ for FILE in $INPUTFILES; do
         sort -gr -k8,8 temp/"$fileID"_gain_unsorted.txt | cut -f1-7 >> output/"$fileID"_ssGain.txt
     fi 
     if [ -s temp/"$fileID"_loss_unsorted.txt ]; then
-        echo -e "#CHR\tSTART\tREF\tALT\tGENE\twithinSS\tdonGainP\taccGainP" > output/"$fileID"_withinSS.txt
+        echo -e "#CHR\tSTART\tREF\tALT\tGENE\twithinSS\tdonLossP\taccLossP" > output/"$fileID"_withinSS.txt
         sort -gr -k9,9 temp/"$fileID"_loss_unsorted.txt | cut -f1-8 >> output/"$fileID"_withinSS.txt
     fi 
     #clean up temp files
-    #rm temp/"$fileID"* 2> /dev/null
+    rm temp/"$fileID"* 2> /dev/null
 done
