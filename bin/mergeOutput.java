@@ -110,40 +110,40 @@ public class mergeOutput {
                     scores[0]=Double.parseDouble(split[5]);
                     scores[1]=Double.parseDouble(split[6]);
                 } else
-                if(type.equals("MESACC")){
-                    scores[2]=Double.parseDouble(split[5]);
-                    scores[3]=Double.parseDouble(split[6]);
-                    scores[12]=Double.parseDouble(split[7]);
-                    scores[13]=Double.parseDouble(split[8]);
-                    scores[14]=Double.parseDouble(split[9]);
-                    scores[15]=Double.parseDouble(split[10]);
-                    scores[16]=Double.parseDouble(split[11]);
-                    scores[17]=Double.parseDouble(split[12]);
-                } else
-                //GeneSplicer
-                if (type.equals("GSREF")) {
-                    if (split[6].equals("donor")) {
-                        scores[4]=Double.parseDouble(split[5]);
+                    if(type.equals("MESACC")){
+                        scores[2]=Double.parseDouble(split[5]);
+                        scores[3]=Double.parseDouble(split[6]);
+                        scores[12]=Double.parseDouble(split[7]);
+                        scores[13]=Double.parseDouble(split[8]);
+                        scores[14]=Double.parseDouble(split[9]);
+                        scores[15]=Double.parseDouble(split[10]);
+                        scores[16]=Double.parseDouble(split[11]);
+                        scores[17]=Double.parseDouble(split[12]);
                     } else
-                    if (split[6].equals("acceptor")) {
-                        scores[6]=Double.parseDouble(split[5]);
-                    } 
-                } else                     
-                if (type.equals("GSALT")) {
-                    if (split[6].equals("donor")) {
-                        scores[5]=Double.parseDouble(split[5]);
-                    } else
-                    if (split[6].equals("acceptor")) {
-                        scores[7]=Double.parseDouble(split[5]);
-                    } 
-                } else
-                //ESR
-                if (type.equals("ESR")) {
-                    scores[8]=Double.parseDouble(split[5]);
-                    scores[9]=Double.parseDouble(split[6]);
-                    scores[10]=Double.parseDouble(split[7]);
-                    scores[11]=Double.parseDouble(split[8]);
-                }
+                        //GeneSplicer
+                        if (type.equals("GSREF")) {
+                            if (split[6].equals("donor")) {
+                                scores[4]=Double.parseDouble(split[5]);
+                            } else
+                                if (split[6].equals("acceptor")) {
+                                    scores[6]=Double.parseDouble(split[5]);
+                                } 
+                        } else                     
+                            if (type.equals("GSALT")) {
+                                if (split[6].equals("donor")) {
+                                    scores[5]=Double.parseDouble(split[5]);
+                                } else
+                                    if (split[6].equals("acceptor")) {
+                                        scores[7]=Double.parseDouble(split[5]);
+                                    } 
+                            } else
+                                //ESR
+                                if (type.equals("ESR")) {
+                                    scores[8]=Double.parseDouble(split[5]);
+                                    scores[9]=Double.parseDouble(split[6]);
+                                    scores[10]=Double.parseDouble(split[7]);
+                                    scores[11]=Double.parseDouble(split[8]);
+                                }
                 //GENE
                 if (type.equals("GENE")) {
                     //overlapping gene annotations
@@ -282,8 +282,7 @@ public class mergeOutput {
                 ogScore = s[13];
             }
             double denovoChange = denovoScore - s[12];
-            pAccGain = 1/(1 + Math.exp(-(99.705 + (s[2] * -0.0.36584) + (s[12] * 12.3598) + (denovoScore * -5.7997) + (ogScore * 0.41298) )));
-        }
+            pDonGain = 1/(1 + Math.exp(-(99.705 + (s[2] * -0.36584) + (s[12] * 12.3598) + (denovoScore * -5.7997) + (ogScore * 0.41298) )));
         }
         if (out[6].contains("acceptor")){
             //pAccLoss = 1/(1 + Math.exp(-(-0.6209 + (mesAccChange * -0.5100) )));
