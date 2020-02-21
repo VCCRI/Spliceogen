@@ -35,7 +35,7 @@ public class mergeOutput {
         //scores[]...mesAccRef2ndScore(12);mesAccAlt2ndScore(13);mesAccRefPos1(14);mesAccAltPos1(15);mesAccRefPos2(16);mesAccAltPos2(17);
         //geneID[]...chr(0), name(1), end(2)
         //prevID[]...chr(0), start(1), ref(2), alt(3), type(4)
-        double[] scores = new double[18];
+        double[] scores = new double[24];
         Arrays.fill(scores, -99.0);
         String[] geneID = { "", ".", ""};
         String[] prevID = { "", "-99", "", "", "GENE"};
@@ -109,41 +109,41 @@ public class mergeOutput {
                 if (type.equals("MESDON")) {
                     scores[0]=Double.parseDouble(split[5]);
                     scores[1]=Double.parseDouble(split[6]);
-                } else
-                    if(type.equals("MESACC")){
-                        scores[2]=Double.parseDouble(split[5]);
-                        scores[3]=Double.parseDouble(split[6]);
-                        scores[12]=Double.parseDouble(split[7]);
-                        scores[13]=Double.parseDouble(split[8]);
-                        scores[14]=Double.parseDouble(split[9]);
-                        scores[15]=Double.parseDouble(split[10]);
-                        scores[16]=Double.parseDouble(split[11]);
-                        scores[17]=Double.parseDouble(split[12]);
-                    } else
-                        //GeneSplicer
-                        if (type.equals("GSREF")) {
-                            if (split[6].equals("donor")) {
-                                scores[4]=Double.parseDouble(split[5]);
-                            } else
-                                if (split[6].equals("acceptor")) {
-                                    scores[6]=Double.parseDouble(split[5]);
-                                } 
-                        } else                     
-                            if (type.equals("GSALT")) {
-                                if (split[6].equals("donor")) {
-                                    scores[5]=Double.parseDouble(split[5]);
-                                } else
-                                    if (split[6].equals("acceptor")) {
-                                        scores[7]=Double.parseDouble(split[5]);
-                                    } 
-                            } else
-                                //ESR
-                                if (type.equals("ESR")) {
-                                    scores[8]=Double.parseDouble(split[5]);
-                                    scores[9]=Double.parseDouble(split[6]);
-                                    scores[10]=Double.parseDouble(split[7]);
-                                    scores[11]=Double.parseDouble(split[8]);
-                                }
+                    scores[18]=Double.parseDouble(split[7]);
+                    scores[19]=Double.parseDouble(split[8]);
+                    scores[20]=Double.parseDouble(split[9]);
+                    scores[21]=Double.parseDouble(split[10]);
+                    scores[22]=Double.parseDouble(split[11]);
+                    scores[23]=Double.parseDouble(split[12]);
+                } else if(type.equals("MESACC")){
+                    scores[2]=Double.parseDouble(split[5]);
+                    scores[3]=Double.parseDouble(split[6]);
+                    scores[12]=Double.parseDouble(split[7]);
+                    scores[13]=Double.parseDouble(split[8]);
+                    scores[14]=Double.parseDouble(split[9]);
+                    scores[15]=Double.parseDouble(split[10]);
+                    scores[16]=Double.parseDouble(split[11]);
+                    scores[17]=Double.parseDouble(split[12]);
+                } else if (type.equals("GSREF")) {
+                //GeneSplicer
+                    if (split[6].equals("donor")) {
+                        scores[4]=Double.parseDouble(split[5]);
+                    } else if (split[6].equals("acceptor")) {
+                        scores[6]=Double.parseDouble(split[5]);
+                    }
+                } else if (type.equals("GSALT")) {
+                    if (split[6].equals("donor")) {
+                        scores[5]=Double.parseDouble(split[5]);
+                    } else if (split[6].equals("acceptor")) {
+                        scores[7]=Double.parseDouble(split[5]);
+                    }
+                } else if (type.equals("ESR")) {
+                //ESR
+                    scores[8]=Double.parseDouble(split[5]);
+                    scores[9]=Double.parseDouble(split[6]);
+                    scores[10]=Double.parseDouble(split[7]);
+                    scores[11]=Double.parseDouble(split[8]);
+                }
                 //GENE
                 if (type.equals("GENE")) {
                     //overlapping gene annotations
@@ -228,11 +228,18 @@ public class mergeOutput {
     }
 
     public static String calculateLogRegScores (double[] s, String[] out) {
+        double imputeVal = -15.0;
+        double donGainIntercept = 0.09186; double donGainCoef_c = 0.1266; double donGainCoef_alt = 0.2655;
+        double accGainIntercept = -1.0362; double accGainCoef_c = 0.1096; double accGainCoef_alt = 0.2869;
+        double donLossIntercept = -0.7309; double donLossCoef_c = -0.7361;
+        double accLossIntercept = -0.93825; double accLossCoef_c = -0.8017;
+        double donGainWithinIntercept = -0.07592; double donGainWithinCoef_d = 1.3941;
+        double accGainWithinIntercept = 0.5292; double accGainWithinCoef_r2 = -0.3682; double accGainWithinCoef_d = 0.5236; double accGainWithinCoef_og = -0.1877;
         //impute missing values
         //maxEntScan
         for (int i=0; i<4; i++) {
             if (s[i]==-99.0 | s[i]==0.0) {
-                s[i] = -20.0;
+                s[i] = imputeVal;
             }
         }
         //gsDonRef
@@ -268,12 +275,11 @@ public class mergeOutput {
         double pDonGain = -1; double pAccGain = -1; double pDonLoss = -1; double pAccLoss = -1;
         // using within/outside splice site logistic regression models, calculate p = 1/(1+e^-(a + b1X1 + b2X2 + ... + bnXn))
         if (!out[6].contains("ENSE")) {
-            pDonGain = 1/(1 + Math.exp(-(-0.9865 + (mesDonChange * 0.1129) + (gsDonChange * 0.01151) + (s[1] * 0.2076) + (s[5] * 0.4350) )));
-            pAccGain = 1/(1 + Math.exp(-(-1.665 + (mesAccChange * 0.3323) + (gsAccChange * 0.05084) + (s[3] * 0.1877) + (s[7] * 0.1730) )));
+            pDonGain = 1/(1 + Math.exp(-(donGainIntercept + (mesDonChange * donGainCoef_c) + (s[1] * donGainCoef_alt))));
+            pAccGain = 1/(1 + Math.exp(-(accGainIntercept + (mesAccChange * accGainCoef_c) + (s[3] * accGainCoef_alt))));
         }
         if (out[6].contains("donor")){
-            //pDonLoss = 1/(1 + Math.exp(-(-1.6678 + (mesDonChange * -0.6752) )));
-            pDonLoss = 1/(1 + Math.exp(-(-1.1028 + (mesDonChange * -0.4240) )));
+            pDonLoss = 1/(1 + Math.exp(-(donLossIntercept + (mesDonChange * donLossCoef_c) )));
             double denovoScore = s[13];
             double ogScore = s[3];
             //if highest alt score is at a different site (accounting for indels)
@@ -282,11 +288,10 @@ public class mergeOutput {
                 ogScore = s[13];
             }
             double denovoChange = denovoScore - s[12];
-            pDonGain = 1/(1 + Math.exp(-(99.705 + (s[2] * -0.36584) + (s[12] * 12.3598) + (denovoScore * -5.7997) + (ogScore * 0.41298) )));
+            pDonGain = 1/(1 + Math.exp(-(donGainWithinIntercept + (denovoScore * donGainWithinCoef_d))));
         }
         if (out[6].contains("acceptor")){
-            //pAccLoss = 1/(1 + Math.exp(-(-0.6209 + (mesAccChange * -0.5100) )));
-            pAccLoss = 1/(1 + Math.exp(-(-0.2355 + (mesAccChange * -0.2283) )));
+            pAccLoss = 1/(1 + Math.exp(-(accLossIntercept + (mesAccChange * accLossCoef_c) )));
             double denovoScore = s[13];
             double ogScore = s[3];
             //if highest alt score is at a different site (accounting for indels)
@@ -295,8 +300,7 @@ public class mergeOutput {
                 ogScore = s[13];
             }
             double denovoChange = denovoScore - s[12];
-            //pAccGain = 1/(1 + Math.exp(-(-0.18441 + (s[2] * -0.13376) + (s[12] * -0.54157) + (denovoScore * 0.61567) + (ogScore * -0.069948) )));
-            pAccGain = 1/(1 + Math.exp(-(1.2445 + (s[2] * 0.55004) + (s[12] * -0.06490) + (denovoScore * 0.33992) + (ogScore * -0.000419) )));
+            pAccGain = 1/(1 + Math.exp(-(accGainWithinIntercept + ( (s[12] * accGainWithinCoef_r2) + (denovoScore * accGainWithinCoef_d) + (ogScore * accGainWithinCoef_og) ))));
         }
         String pDonGainStr = Double.toString(pDonGain);
         String pAccGainStr = Double.toString(pAccGain);
