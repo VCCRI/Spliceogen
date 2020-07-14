@@ -211,7 +211,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                                 mesIndexAcc++;
                                 j++;
                             }
-                            while (j<ref.length()+correct2);
+                            while (j<ref.length()+correct2 && i>=j+18);
                         } else
                             if (alt.length()>1) {
                                 int j=1;
@@ -240,7 +240,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                                 mesIndexDon++;
                                 j++;
                             }
-                            while (j<ref.length()+correct2);
+                            while (j<ref.length()+correct2  && i >= j+3);
                         } else
                             if (alt.length()>1) {
                                 int j=1;
@@ -273,7 +273,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                                 mesIndexAcc++;
                                 j++;
                             }
-                            while (j<alt.length());
+                            while (j<alt.length() && i >= j+18);
                         }
                         if (ref.length()>1||correct2==1) {
                             int j=1;
@@ -301,7 +301,7 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
                                 mesIndexDon++;
                                 j++;
                             }
-                            while (j<alt.length());
+                            while (j<alt.length() && i >= j+3);
                         }
                         if (ref.length()>1 || correct2==1) {
                             int j=1;
@@ -429,10 +429,15 @@ correct2: adjusts for empty alt strings, arising from deletions denoted for exam
     }
 
     public static boolean containsIllegalFastaChar(String s, int i) {
+        s = s.toUpperCase();
         for (int k=0; k<i; k++) {
-            char current = s.toUpperCase().charAt(k);
-            if (current=='N'|| current==',') {
-                return true;
+            switch(s.charAt(k))
+            {
+                case 'A': break;
+                case 'C': break;
+                case 'G': break;
+                case 'T': break;
+                default: return true;
             }
         }
         return false;
