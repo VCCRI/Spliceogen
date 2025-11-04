@@ -42,6 +42,9 @@ case $key in
     ;;
     -input)
     INPUTFILES="$2"
+    if [[ "${INPUTFILES//[^:]}" =~ ^:{3,}$ ]]; then
+        INPUTFILES="inputString.tsv"
+    fi  
     shift
     shift
     while [ "$1" ] && [[ ! $1 == *-* ]]; do
