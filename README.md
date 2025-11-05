@@ -7,15 +7,17 @@ git clone -b comp3900 https://github.com/VCCRI/Spliceogen.git
 ```
 
 ### Spliceogen Dependencies:
--Bedtools
-
--Java
-
-See setup.py. I ran those commands on a fresh Ubuntu 22.04 VM. Everything installed and Spliceogen ran correctly.
+Run ./setup.py to install Java and Bedtools. I just tested this on a fresh Ubuntu 24.04 VM. Everything installed and Spliceogen ran correctly.
 
 ## Running Spliceogen
 
-First, try to run the "test usage" variant. To run any variant in the genome, you will need the large annotation files below.
+First, try to run the "test usage" command. If you get the following JSON output, then the software is running correctly:
+
+
+{"#CHR":"chr1", "START":"65510", "END":"65510", "REF":"T", "ALT":"G", "GENE":".", "withinSite":".", "mesDonRef":".", "mesDonAlt":".", "mesAccRef":"9.11", "mesAccAlt":"7.79", "gsDonRef":".", "gsDonAlt":".", "gsAccRef":"4.633193", "gsAccAlt":"2.350955", "ESEmaxRef":".", "ESEmaxAlt":".", "ESSminRef":"-0.286", "ESSminAlt":"-0.355", "donGainP":"0.02", "accGainP":"0.74", "donLossP":".", "accLossP":"."}
+
+
+Next, setup the GTF and FASTA files, which will allow running any variant in the genome.
 
 ### Test Usage:
 ```
