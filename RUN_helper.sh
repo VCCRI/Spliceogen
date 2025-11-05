@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "$2" | tr ":" "\t" > inputString.tsv
-rm output/inputString.tsv*
+rm output/inputString.tsv* 2>/dev/null
 
 ./RUN.sh "$@" > /dev/null 2>&1
 
