@@ -1,5 +1,9 @@
 #!/bin/bash
-echo "$2" | tr ":" "\t" > inputString.tsv
+#assuming hg38 for now
+#echo "$2" | tr ":" "\t" > inputString.tsv
+grep "^#" toy/toy.vcf > inputString.vcf
+echo "$2" | awk -F'[:]' -v OFS="\t" '{print $1, $2, ".", $3, $4, ".", ".", "."}' >> inputString.vcf
+
 rm output/inputString.tsv* 2>/dev/null
 
 ./RUN.sh "$@" > /dev/null 2>&1

@@ -43,7 +43,7 @@ case $key in
     -input)
     INPUTFILES="$2"
     if [[ "${INPUTFILES//[^:]}" =~ ^:{3,}$ ]]; then
-        INPUTFILES="inputString.tsv"
+        INPUTFILES="inputString.vcf"
     fi  
     shift
     shift
